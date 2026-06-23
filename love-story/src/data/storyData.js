@@ -11,6 +11,9 @@ import daoThanhAnImg from "../assets/2_đứa_đi_đảo_thạnh_an.png";
 import vungTau1Img from "../assets/hình_2_đứa_đi_vũng_tàu.png";
 import vungTau2Img from "../assets/hình_2_đứa_đi_vũng_tàu2.png";
 import longAnImg from "../assets/đi_chơi_ở_long_an.png";
+import capheImg from "../assets/2_đứa_đi_cà_phê.png";
+import longAn2Img from "../assets/2_đứa_đi_long_an.png";
+import sixthangImg from "../assets/quà_6th.png";
 
 export const coupleInfo = {
   person1: "Khánh Duy",
@@ -84,7 +87,7 @@ export const stories = [
       "Buổi hẹn đầu tiên, tim đập nhanh hơn bình thường gấp mấy lần. Bờ kè sông Sài Gòn, hai ly nước chưa kịp uống đã nguội vì mải nói chuyện. Một cuộc trò chuyện mà cả hai đều không muốn nó kết thúc.",
     hiddenThought: "Mình đã chọn áo tới 3 lần trước khi ra cửa.",
     mood: "happy",
-    image: null,
+    image: capheImg,
     hasVoiceNote: true,
     locked: false,
   },
@@ -93,7 +96,7 @@ export const stories = [
     date: "20/01/2026",
     title: "Lần đầu cãi nhau",
     content:
-      "Một chuyện rất nhỏ, vậy mà cả hai im lặng cả buổi tối. Nhưng rồi ai cũng là người chủ động nhắn lại trước. Hoá ra giận nhau cũng là một cách để hiểu nhau hơn một chút.",
+      "Chuyện to cũng có chuyện nhỏ cũng có, Nhưng rồi ai cũng là người chủ động nhắn lại trước. Hoá ra giận nhau cũng là một cách để hiểu nhau hơn một chút.",
     hiddenThought: "Thật ra lúc đó chỉ sợ một điều: mất nhau.",
     mood: "sad",
     image: emGianImg,
@@ -108,7 +111,7 @@ export const stories = [
       "Không cần gì cầu kỳ, chỉ cần ngồi cạnh nhau tâm sự ăn uống ( ăn thịt thỏ) cũng đủ thấy ấm. Đó là lúc mình nhận ra, hạnh phúc đôi khi chỉ đơn giản là có người đó ở bên.",
     hiddenThought: "Mình đã âm thầm chụp lại khoảnh khắc đó, không nói gì.",
     mood: "deep",
-    image: null,
+    image: heroBackgroundImg,
     hasVoiceNote: true,
     locked: false,
   },
@@ -120,7 +123,7 @@ export const stories = [
       "Sáu tháng đầu tiên bên nhau, với rất nhiều lần cười, vài lần giận, và muôn vàn lý do để yêu nhau nhiều hơn mỗi ngày. Chặng đường còn dài, nhưng mình tin cả hai sẽ luôn nắm tay nhau đi qua hết.",
     hiddenThought: "Mình mong sáu tháng tiếp theo cũng sẽ nhiều như vậy.",
     mood: "deep",
-    image: null,
+    image: sixthangImg,
     hasVoiceNote: false,
     locked: false,
   },
@@ -132,7 +135,7 @@ export const stories = [
       "Bạn đã tìm ra góc nhỏ bí mật này rồi! Đây là điều mà chỉ có hai người mới biết: cảm ơn vì đã luôn kiên nhẫn, luôn dịu dàng, và luôn chọn ở lại dù mọi thứ không hoàn hảo. Đây là một ký ức chỉ dành riêng cho bạn. 💕",
     hiddenThought: "Cảm ơn vì đã tò mò đủ để tìm ra điều này.",
     mood: "deep",
-    image: null,
+    image: longAn2Img,
     hasVoiceNote: false,
     locked: true,
   },
@@ -162,21 +165,21 @@ export const secretCode = "ourstory";
 // Tin nhắn chat kỷ niệm. `storyId` (nếu có) link tới chapter trong `stories`
 // để bấm vào "expand context" mở thẳng StoryViewer.
 export const chatMessages = [
-  { id: 1, sender: "her", text: "Ủa là ai vậy 😳", time: "20:14", storyId: 1 },
+  {
+    id: 1,
+    sender: "me",
+    text: "Đang nói đến đây rồi chị",
+    time: "23:53",
+    storyId: 1,
+  },
   {
     id: 2,
-    sender: "me",
-    text: "Chào bạn, mình quen lúc chiều đó haha",
+    sender: "her",
+    text: "À nhớ rồi, hôm đó chị cũng ngại quá đi 😂",
     time: "20:15",
     storyId: 2,
   },
-  {
-    id: 3,
-    sender: "her",
-    text: "À nhớ rồi 😂 ngại quá đi",
-    time: "20:17",
-    storyId: 2,
-  },
+
   {
     id: 4,
     sender: "me",
@@ -187,21 +190,21 @@ export const chatMessages = [
   {
     id: 5,
     sender: "her",
-    text: "Ok đó, hẹn 2h chiều nha",
+    text: "Ok đó, hẹn 8h tối nha",
     time: "21:05",
     storyId: 3,
   },
   {
     id: 6,
     sender: "me",
-    text: "Sao tự nhiên không trả lời tin nhắn 🙄",
+    text: "Anh có chuyện muốn nói với em 🙄",
     time: "22:40",
     storyId: 4,
   },
   {
     id: 7,
     sender: "her",
-    text: "Thôi giận hết rồi, ngủ ngon nha 🥺",
+    text: "...",
     time: "23:58",
     storyId: 4,
   },
@@ -215,7 +218,7 @@ export const chatMessages = [
   {
     id: 9,
     sender: "me",
-    text: "6 tháng rồi đó, cảm ơn vì đã ở đây 🥹",
+    text: "6 tháng rồi đó, cảm ơn em vì đã ở đây 🥹",
     time: "09:12",
     storyId: 6,
   },
