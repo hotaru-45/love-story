@@ -12,7 +12,7 @@ function VoiceNoteButton({ active, onToggle }) {
       className="flex items-center gap-2 self-start rounded-full bg-white/15 px-4 py-2 text-sm font-medium text-rose-100 transition hover:bg-white/25"
     >
       <span>{active ? '⏸️' : '🎙️'}</span>
-      <span>{active ? 'Đang nghe voice note...' : 'Nghe voice note'}</span>
+      <span>{active ? 'Đang nghe đoạn ghi âm...' : 'Nghe đoạn ghi âm'}</span>
       <span className="flex items-end gap-0.5 h-4">
         {[0, 1, 2, 3, 4].map((bar) => (
           <span
@@ -73,7 +73,7 @@ export default function StoryViewer({ stories, index, onClose, onChangeIndex }) 
             <button
               key={s.id}
               type="button"
-              aria-label={`Chapter ${i + 1}`}
+              aria-label={`Chương ${i + 1}`}
               onClick={() => onChangeIndex(i)}
               className={`h-1 flex-1 rounded-full transition-colors ${
                 i <= index ? 'bg-white' : 'bg-white/25'

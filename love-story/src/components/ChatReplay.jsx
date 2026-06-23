@@ -58,7 +58,7 @@ export default function ChatReplay({ onOpenStory }) {
         transition={{ duration: 0.6 }}
         className="mx-auto max-w-3xl text-center"
       >
-        <h2 className="text-2xl font-semibold text-white sm:text-3xl">💬 Chat Replay</h2>
+        <h2 className="text-2xl font-semibold text-white sm:text-3xl">💬 Phát Lại Đoạn Chat</h2>
         <p className="mt-2 text-sm text-rose-200/80">
           Những đoạn chat đáng nhớ — bấm vào để xem ngữ cảnh câu chuyện
         </p>

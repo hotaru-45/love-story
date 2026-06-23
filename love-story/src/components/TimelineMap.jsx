@@ -29,7 +29,7 @@ function MapNode({ story, index, onOpen }) {
 
       <div className="glass-card flex-1 rounded-2xl p-4 transition-transform group-hover:scale-[1.02]">
         {locked ? (
-          <p className="text-sm text-rose-200/70">Chapter bí mật — vẫn còn bị khoá 🔒</p>
+          <p className="text-sm text-rose-200/70">Chương bí mật — vẫn còn bị khoá 🔒</p>
         ) : (
           <>
             <p className="text-xs uppercase tracking-wide text-rose-200/70">{story.date}</p>
@@ -50,7 +50,7 @@ function HiddenHeartNode() {
     <button
       type="button"
       onClick={() => unlock(lockedChapterId, target.title)}
-      aria-label="hidden heart"
+      aria-label="tim ẩn"
       className="ml-7 w-fit text-base opacity-20 transition-opacity hover:opacity-80"
     >
       ✨
@@ -62,7 +62,7 @@ export default function TimelineMap({ onOpen }) {
   return (
     <section id="timeline-map" className="relative px-6 py-20">
       <h2 className="text-center text-2xl font-semibold text-white sm:text-3xl">
-        🧭 Memory Map
+        🧭 Bản Đồ Kỷ Niệm
       </h2>
       <p className="mx-auto mt-2 max-w-md text-center text-sm text-rose-200/80">
         Mỗi điểm là một mốc kỷ niệm. Có một thứ ẩn trên con đường này — để ý kỹ nhé.

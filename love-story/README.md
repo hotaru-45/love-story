@@ -56,7 +56,7 @@ Có **1 chapter bonus bị khoá** (chapter cuối, `locked: true` trong
 `storyData.js`) — các kỷ niệm thật không bị khoá, để không làm khó người
 nhận quà. Chapter bonus này mở được qua **4 cách độc lập** (làm 1 trong 4 là đủ):
 
-1. Bấm logo "💌 Our Story" ở Home 5 lần.
+1. Bấm logo "💌 Chuyện Của Chúng Mình" ở Home 5 lần.
 2. Bấm vào "heart ẩn" (✨ mờ, opacity thấp) ở cuối Memory Map.
 3. Cuộn đủ sâu trang (qua `ScrollDepthUnlocker`, tự động, không cần bấm gì).
 4. Nhập đúng mã bí mật (mặc định `ourstory`, đổi ở `secretCode` trong data)

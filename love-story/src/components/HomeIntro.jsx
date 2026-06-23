@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
-import { coupleInfo, loveQuotes, lockedChapterId, stories } from '../data/storyData'
+import { coupleInfo, loveQuotes, lockedChapterId, stories, heroBackground } from '../data/storyData'
 import { useTypewriterSequence } from '../hooks/useTypewriter'
 import { useUnlockSystem } from '../hooks/unlockContext'
 import LoveCounter from './LoveCounter'
@@ -48,6 +48,15 @@ export default function HomeIntro() {
       ref={sectionRef}
       className="relative flex min-h-svh flex-col items-center justify-center overflow-hidden px-6 py-20 text-center"
     >
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        <img
+          src={heroBackground}
+          alt=""
+          className="h-full w-full object-cover opacity-50"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-[#1a0b1f]" />
+      </div>
+
       <motion.div
         style={{ y: blobY1 }}
         className="pointer-events-none absolute -left-20 top-10 h-72 w-72 rounded-full bg-purple-600/30 blur-3xl"
@@ -64,7 +73,7 @@ export default function HomeIntro() {
           whileTap={{ scale: 0.9 }}
           className="select-none text-sm font-medium uppercase tracking-[0.2em] text-rose-200/80"
         >
-          💌 Our Story
+          💌 Chuyện Của Chúng Mình
         </motion.button>
 
         <motion.h1
@@ -98,7 +107,7 @@ export default function HomeIntro() {
             whileTap={{ scale: 0.95 }}
             className="rounded-full bg-rose-500 px-6 py-3 text-sm font-medium text-white shadow-lg shadow-rose-500/30 hover:bg-rose-600"
           >
-            Enter Memory World ↓
+            Bước Vào Thế Giới Kỷ Niệm ↓
           </motion.button>
 
           <motion.button
@@ -106,7 +115,7 @@ export default function HomeIntro() {
             onMouseEnter={revealQuote}
             onClick={revealQuote}
             whileTap={{ scale: 0.9 }}
-            aria-label="love quote"
+            aria-label="câu nói yêu thương"
             className="rounded-full bg-white/10 p-3 text-xl hover:bg-white/20"
           >
             💗

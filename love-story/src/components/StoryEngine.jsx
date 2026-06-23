@@ -24,9 +24,18 @@ function Chapter({ story, index, onOpen }) {
           rewinding ? 'rewind-filter' : ''
         }`}
       >
-        <div className="animate-ken-burns absolute inset-0 flex items-center justify-center text-[14rem] opacity-30">
-          {theme.emoji}
-        </div>
+        {story.image ? (
+          <img
+            src={story.image}
+            alt=""
+            loading="lazy"
+            className="animate-ken-burns absolute inset-0 h-full w-full object-cover"
+          />
+        ) : (
+          <div className="animate-ken-burns absolute inset-0 flex items-center justify-center text-[14rem] opacity-30">
+            {theme.emoji}
+          </div>
+        )}
         <div className="absolute inset-0 bg-black/40" />
       </div>
 
@@ -45,7 +54,7 @@ function Chapter({ story, index, onOpen }) {
         >
           <span className="text-5xl">🔒</span>
           <p className="max-w-xs text-sm text-rose-200/80">
-            Chapter {index + 1} vẫn còn bị khoá — hãy khám phá thêm để mở nó ra.
+            Chương {index + 1} vẫn còn bị khoá — hãy khám phá thêm để mở nó ra.
           </p>
         </motion.div>
       ) : (
@@ -57,7 +66,7 @@ function Chapter({ story, index, onOpen }) {
           className="relative flex max-w-xl flex-col items-center gap-4"
         >
           <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-rose-100">
-            {theme.emoji} {theme.label} · Chapter {index + 1}
+            {theme.emoji} {theme.label} · Chương {index + 1}
           </span>
           <h2 className="text-4xl font-light tracking-wide text-white sm:text-6xl">
             {story.title}
@@ -100,7 +109,7 @@ export default function StoryEngine({ onOpen }) {
   return (
     <section id="story-engine" className="relative">
       <div className="px-6 pt-16 text-center">
-        <h2 className="text-2xl font-semibold text-white sm:text-3xl">📖 Story World</h2>
+        <h2 className="text-2xl font-semibold text-white sm:text-3xl">📖 Thế Giới Câu Chuyện</h2>
         <p className="mt-2 text-sm text-rose-200/80">
           Cuộn xuống để bước qua từng chương. Bấm để xem suy nghĩ ẩn, nhấn giữ ảnh nền để
           &quot;tua lại&quot; ký ức.

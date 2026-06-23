@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
-import { finalLetter } from '../data/storyData'
+import { finalLetter, finalBackground } from '../data/storyData'
 
 export default function FinalLetter() {
   const ref = useRef(null)
@@ -8,12 +8,21 @@ export default function FinalLetter() {
   const [opened, setOpened] = useState(false)
 
   return (
-    <section
-      ref={ref}
-      className={`relative px-6 py-24 transition-colors duration-1000 ${
-        opened ? 'bg-gradient-to-b from-amber-900/20 via-rose-900/30 to-transparent' : ''
-      }`}
-    >
+    <section ref={ref} className="relative px-6 py-24">
+      <AnimatePresence>
+        {opened && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1.2 }}
+            className="absolute inset-0 -z-10 overflow-hidden"
+          >
+            <img src={finalBackground} alt="" className="h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#1a0b1f] via-amber-900/40 to-rose-900/50" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {inView && !opened && (
         <motion.button
           type="button"
