@@ -14,6 +14,8 @@ import longAnImg from "../assets/đi_chơi_ở_long_an.png";
 import capheImg from "../assets/2_đứa_đi_cà_phê.png";
 import longAn2Img from "../assets/2_đứa_đi_long_an.png";
 import sixthangImg from "../assets/quà_6th.png";
+import aPiccher from "../assets/a.png";
+import bPiccher from "../assets/b.png";
 
 export const coupleInfo = {
   person1: "Khánh Duy",
@@ -63,7 +65,7 @@ export const stories = [
       "Một buổi chiều rất bình thường, nhưng lại là khởi đầu cho một câu chuyện không bình thường. Mình đã đứng đó, ngại ngùng không biết bắt đầu câu chuyện từ đâu. Ánh mắt đầu tiên ấy, đến giờ vẫn còn nhớ rõ như mới hôm qua.",
     hiddenThought: 'Lúc đó mình đã nghĩ: "người này có gì đó khác lắm."',
     mood: "happy",
-    image: null,
+    image: aPiccher,
     hasVoiceNote: true,
     locked: false,
   },
@@ -75,7 +77,7 @@ export const stories = [
       'Một tin nhắn "chào bạn" ngại ngùng, gõ đi xoá lại không biết bao nhiêu lần, cuối cùng cũng bấm gửi. Ai mà ngờ được một câu chào đơn giản như vậy lại mở ra hàng ngàn tin nhắn, hàng trăm đêm thức khuya trò chuyện sau đó.',
     hiddenThought: "Mình đã gõ lại câu đó ít nhất 5 lần trước khi gửi.",
     mood: "funny",
-    image: null,
+    image: bPiccher,
     hasVoiceNote: false,
     locked: false,
   },
