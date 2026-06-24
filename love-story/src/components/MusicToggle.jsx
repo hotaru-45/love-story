@@ -1,20 +1,24 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { musicSrc, trackTitle } from '../data/storyData'
+import { usePreferences } from '../hooks/preferencesContext'
 
 export default function MusicToggle() {
   const audioRef = useRef(null)
   const [playing, setPlaying] = useState(false)
+  const { music } = usePreferences()
 
   useEffect(() => {
     const audio = audioRef.current
     if (!audio) return
-    if (playing) {
+    if (playing && music) {
       audio.play().catch(() => setPlaying(false))
     } else {
       audio.pause()
     }
-  }, [playing])
+  }, [playing, music])
+
+  if (!music) return null
 
   return (
     <>
@@ -36,7 +40,7 @@ export default function MusicToggle() {
         <span className="hidden max-w-[9rem] truncate text-xs font-medium text-rose-100 sm:block">
           {playing ? trackTitle : 'Nhạc nền'}
         </span>
-        <span className="flex items-end gap-0.5 pr-1">
+        <span className="hidden items-end gap-0.5 pr-1 sm:flex">
           {[0, 1, 2].map((bar) => (
             <span
               key={bar}

@@ -42,6 +42,14 @@ export default function StoryViewer({ stories, index, onClose, onChangeIndex }) 
   }, [voiceActive])
 
   useEffect(() => {
+    ;[stories[index - 1]?.image, stories[index + 1]?.image].forEach((src) => {
+      if (!src) return
+      const img = new Image()
+      img.src = src
+    })
+  }, [index, stories])
+
+  useEffect(() => {
     function handleKey(e) {
       if (e.key === 'Escape') onClose()
       if (e.key === 'ArrowRight') goNext()
@@ -81,6 +89,18 @@ export default function StoryViewer({ stories, index, onClose, onChangeIndex }) 
             />
           ))}
         </div>
+
+        <motion.div
+          drag="y"
+          dragConstraints={{ top: 0, bottom: 0 }}
+          dragElastic={0.4}
+          onDragEnd={(_, info) => {
+            if (info.offset.y > 80) onClose()
+          }}
+          className="flex w-full cursor-grab justify-center py-1 active:cursor-grabbing sm:hidden"
+        >
+          <span className="h-1.5 w-12 rounded-full bg-white/30" />
+        </motion.div>
 
         <button
           type="button"

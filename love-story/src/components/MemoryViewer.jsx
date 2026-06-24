@@ -40,6 +40,18 @@ export default function MemoryViewer({ story, onClose }) {
         className="glass-card flex max-h-[85vh] w-full max-w-md flex-col overflow-hidden rounded-3xl"
         onClick={(e) => e.stopPropagation()}
       >
+        <motion.div
+          drag="y"
+          dragConstraints={{ top: 0, bottom: 0 }}
+          dragElastic={0.4}
+          onDragEnd={(_, info) => {
+            if (info.offset.y > 80) onClose()
+          }}
+          className="flex w-full cursor-grab justify-center py-2 active:cursor-grabbing sm:hidden"
+        >
+          <span className="h-1.5 w-12 rounded-full bg-white/30" />
+        </motion.div>
+
         <div className="relative h-72 w-full overflow-hidden">
           <motion.div
             animate={{ scale: zoomed ? 2 : 1 }}
@@ -53,7 +65,12 @@ export default function MemoryViewer({ story, onClose }) {
             }`}
           >
             {story.image ? (
-              <img src={story.image} alt={story.title} className="h-full w-full object-cover" />
+              <img
+                src={story.image}
+                alt={story.title}
+                loading="lazy"
+                className="h-full w-full object-cover"
+              />
             ) : (
               theme.emoji
             )}

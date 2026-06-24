@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
-
-const HEART_COUNT = 14
+import { usePreferences } from '../hooks/preferencesContext'
 
 function randomHeart(seed) {
   return {
@@ -14,9 +13,12 @@ function randomHeart(seed) {
 }
 
 export default function FloatingHearts() {
+  const { reducedMotion, performanceMode } = usePreferences()
+  const count = reducedMotion ? 4 : performanceMode ? 7 : 14
+
   const hearts = useMemo(
-    () => Array.from({ length: HEART_COUNT }, (_, i) => randomHeart(i)),
-    [],
+    () => Array.from({ length: count }, (_, i) => randomHeart(i)),
+    [count],
   )
 
   return (

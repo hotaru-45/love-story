@@ -28,7 +28,8 @@ function Chapter({ story, index, onOpen }) {
           <img
             src={story.image}
             alt=""
-            loading="lazy"
+            loading={index === 0 ? 'eager' : 'lazy'}
+            fetchPriority={index === 0 ? 'high' : 'auto'}
             className="animate-ken-burns absolute inset-0 h-full w-full object-cover"
           />
         ) : (

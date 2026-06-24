@@ -52,6 +52,8 @@ export default function HomeIntro() {
         <img
           src={heroBackground}
           alt=""
+          loading="eager"
+          fetchPriority="high"
           className="h-full w-full object-cover opacity-50"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-[#1a0b1f]" />
@@ -59,11 +61,11 @@ export default function HomeIntro() {
 
       <motion.div
         style={{ y: blobY1 }}
-        className="pointer-events-none absolute -left-20 top-10 h-72 w-72 rounded-full bg-purple-600/30 blur-3xl"
+        className="home-blob pointer-events-none absolute -left-20 top-10 h-72 w-72 rounded-full bg-purple-600/30 blur-3xl"
       />
       <motion.div
         style={{ y: blobY2 }}
-        className="pointer-events-none absolute -right-16 bottom-10 h-80 w-80 rounded-full bg-rose-500/30 blur-3xl"
+        className="home-blob pointer-events-none absolute -right-16 bottom-10 h-80 w-80 rounded-full bg-rose-500/30 blur-3xl"
       />
 
       <motion.div style={{ opacity: contentOpacity }} className="relative flex flex-col items-center">

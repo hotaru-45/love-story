@@ -17,6 +17,9 @@ import sixthangImg from "../assets/quà_6th.png";
 import aPiccher from "../assets/a.png";
 import bPiccher from "../assets/b.png";
 
+// Mật khẩu cổng vào (ngày kỷ niệm, format DD/MM/YYYY) — đổi nếu muốn.
+export const anniversaryPassword = "24/12/2025";
+
 export const coupleInfo = {
   person1: "Khánh Duy",
   person2: "Phương Thảo",
@@ -62,7 +65,7 @@ export const stories = [
     date: "24/12/2025",
     title: "Lần đầu gặp nhau",
     content:
-      "Một buổi chiều rất bình thường, nhưng lại là khởi đầu cho một câu chuyện không bình thường. Mình đã đứng đó, ngại ngùng không biết bắt đầu câu chuyện từ đâu. Ánh mắt đầu tiên ấy, đến giờ vẫn còn nhớ rõ như mới hôm qua.",
+      "Một buổi tối rất bình thường, nhưng lại là khởi đầu cho một câu chuyện không bình thường. Mình đã đứng đó, ngại ngùng không biết bắt đầu câu chuyện từ đâu. Ánh mắt đầu tiên ấy, đến giờ vẫn còn nhớ rõ như mới hôm qua.",
     hiddenThought: 'Lúc đó mình đã nghĩ: "người này có gì đó khác lắm."',
     mood: "happy",
     image: aPiccher,

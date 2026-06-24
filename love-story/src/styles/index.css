@@ -64,6 +64,18 @@ body {
   50% { transform: translateY(-3px); opacity: 1; }
 }
 
+@keyframes lock-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+@keyframes shake {
+  10%, 90% { transform: translateX(-1px); }
+  20%, 80% { transform: translateX(2px); }
+  30%, 50%, 70% { transform: translateX(-4px); }
+  40%, 60% { transform: translateX(4px); }
+}
+
 .animate-heartbeat {
   animation: heartbeat 1.6s ease-in-out infinite;
 }
@@ -92,4 +104,40 @@ body {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(16px);
+}
+
+.animate-lock-pulse {
+  animation: lock-pulse 2s ease-in-out infinite;
+}
+
+.animate-shake {
+  animation: shake 0.5s;
+}
+
+/* Mobile performance mode / reduced motion — kills continuous, GPU-costly
+   effects while leaving one-shot feedback animations (shake, pulse-once)
+   untouched. */
+.lite-mode .animate-ken-burns,
+.lite-mode .animate-glow-pulse,
+.lite-mode .animate-lock-pulse {
+  animation: none;
+}
+.lite-mode .rewind-filter {
+  filter: none;
+}
+.lite-mode .glass-card {
+  backdrop-filter: blur(6px);
+}
+.lite-mode .home-blob {
+  filter: blur(24px) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *:not(.animate-float-up),
+  *:not(.animate-float-up)::before,
+  *:not(.animate-float-up)::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }
