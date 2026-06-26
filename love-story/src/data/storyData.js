@@ -16,6 +16,7 @@ import longAn2Img from "../assets/2_đứa_đi_long_an.png";
 import sixthangImg from "../assets/quà_6th.png";
 import aPiccher from "../assets/a.png";
 import bPiccher from "../assets/b.png";
+import totinhImg from "../assets/totinh.png";
 
 // Mật khẩu cổng vào (ngày kỷ niệm, format DD/MM/YYYY) — đổi nếu muốn.
 export const anniversaryPassword = "24/12/2025";
@@ -51,6 +52,11 @@ export const moodMeta = {
     emoji: "🌙",
     gradient: "from-indigo-400 via-purple-500 to-rose-500",
   },
+  love: {
+    label: "Yêu thương",
+    emoji: "💖",
+    gradient: "from-rose-400 via-pink-500 to-red-500",
+  },
 };
 
 // Mỗi "chapter" trong câu chuyện. `image: null` sẽ hiện placeholder gradient
@@ -62,7 +68,7 @@ export const moodMeta = {
 export const stories = [
   {
     id: 1,
-    date: "24/12/2025",
+    date: "14/01/2026",
     title: "Lần đầu gặp nhau",
     content:
       "Một buổi tối rất bình thường, nhưng lại là khởi đầu cho một câu chuyện không bình thường. Mình đã đứng đó, ngại ngùng không biết bắt đầu câu chuyện từ đâu. Ánh mắt đầu tiên ấy, đến giờ vẫn còn nhớ rõ như mới hôm qua.",
@@ -74,7 +80,7 @@ export const stories = [
   },
   {
     id: 2,
-    date: "26/12/2025",
+    date: "24/12/2025",
     title: "Lần đầu nhắn tin",
     content:
       'Một tin nhắn "chào bạn" ngại ngùng, gõ đi xoá lại không biết bao nhiêu lần, cuối cùng cũng bấm gửi. Ai mà ngờ được một câu chào đơn giản như vậy lại mở ra hàng ngàn tin nhắn, hàng trăm đêm thức khuya trò chuyện sau đó.',
@@ -86,7 +92,7 @@ export const stories = [
   },
   {
     id: 3,
-    date: "01/01/2026",
+    date: "28/01/2026",
     title: "Lần đầu hẹn hò",
     content:
       "Buổi hẹn đầu tiên, tim đập nhanh hơn bình thường gấp mấy lần. Bờ kè sông Sài Gòn, hai ly nước chưa kịp uống đã nguội vì mải nói chuyện. Một cuộc trò chuyện mà cả hai đều không muốn nó kết thúc.",
@@ -110,6 +116,18 @@ export const stories = [
   },
   {
     id: 5,
+    date: "21/01/2026",
+    title: "Ngày tỏ tình",
+    content:
+      "Một hộp quà nhỏ, một chú thỏ bông và một trái tim đập nhanh hơn bình thường. Anh đã lấy hết can đảm để nói điều mình giữ trong lòng bấy lâu. Khi em mỉm cười nhận món quà và đồng ý, ngày 21/01 đã trở thành ngày đặc biệt nhất của cả hai.",
+    hiddenThought: "Cảm ơn em vì đã chọn anh từ khoảnh khắc ấy.",
+    mood: "love",
+    image: totinhImg,
+    hasVoiceNote: false,
+    locked: false,
+  },
+  {
+    id: 6,
     date: "14/02/2026",
     title: "Valentine đầu tiên",
     content:
@@ -121,7 +139,7 @@ export const stories = [
     locked: false,
   },
   {
-    id: 6,
+    id: 7,
     date: "24/06/2026",
     title: "Kỷ niệm 6 tháng",
     content:
@@ -133,7 +151,7 @@ export const stories = [
     locked: false,
   },
   {
-    id: 7,
+    id: 8,
     date: "???",
     title: "🔓 Ký ức bí mật",
     content:
