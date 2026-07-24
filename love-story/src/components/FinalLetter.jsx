@@ -52,7 +52,7 @@ export default function FinalLetter() {
             <h2 className="text-center text-2xl font-semibold text-white sm:text-3xl">
               {finalLetter.title}
             </h2>
-            <div className="mt-6 space-y-4 font-serif text-[15px] italic leading-relaxed text-rose-100/90 sm:text-base">
+            <div className="mt-6 space-y-4 text-[15px] italic leading-relaxed text-rose-100/90 sm:text-base">
               {finalLetter.paragraphs.map((p, i) => (
                 <p key={i}>{p}</p>
               ))}

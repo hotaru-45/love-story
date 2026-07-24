@@ -67,18 +67,6 @@ export const moodMeta = {
 // "bonus" — đừng khoá kỷ niệm thật, tránh làm khó người nhận quà.
 export const stories = [
   {
-    id: 1,
-    date: "14/01/2026",
-    title: "Lần đầu gặp nhau",
-    content:
-      "Một buổi tối rất bình thường, nhưng lại là khởi đầu cho một câu chuyện không bình thường. Mình đã đứng đó, ngại ngùng không biết bắt đầu câu chuyện từ đâu. Ánh mắt đầu tiên ấy, đến giờ vẫn còn nhớ rõ như mới hôm qua.",
-    hiddenThought: 'Lúc đó mình đã nghĩ: "người này có gì đó khác lắm."',
-    mood: "happy",
-    image: aPiccher,
-    hasVoiceNote: true,
-    locked: false,
-  },
-  {
     id: 2,
     date: "24/12/2025",
     title: "Lần đầu nhắn tin",
@@ -91,14 +79,14 @@ export const stories = [
     locked: false,
   },
   {
-    id: 3,
-    date: "28/01/2026",
-    title: "Lần đầu hẹn hò",
+    id: 1,
+    date: "14/01/2026",
+    title: "Lần đầu gặp nhau",
     content:
-      "Buổi hẹn đầu tiên, tim đập nhanh hơn bình thường gấp mấy lần. Bờ kè sông Sài Gòn, hai ly nước chưa kịp uống đã nguội vì mải nói chuyện. Một cuộc trò chuyện mà cả hai đều không muốn nó kết thúc.",
-    hiddenThought: "Mình đã chọn áo tới 3 lần trước khi ra cửa.",
+      "Một buổi tối rất bình thường, nhưng lại là khởi đầu cho một câu chuyện không bình thường. Mình đã đứng đó, ngại ngùng không biết bắt đầu câu chuyện từ đâu. Ánh mắt đầu tiên ấy, đến giờ vẫn còn nhớ rõ như mới hôm qua.",
+    hiddenThought: 'Lúc đó mình đã nghĩ: "người này có gì đó khác lắm."',
     mood: "happy",
-    image: capheImg,
+    image: aPiccher,
     hasVoiceNote: true,
     locked: false,
   },
@@ -124,6 +112,18 @@ export const stories = [
     mood: "love",
     image: totinhImg,
     hasVoiceNote: false,
+    locked: false,
+  },
+  {
+    id: 3,
+    date: "28/01/2026",
+    title: "Lần đầu hẹn hò",
+    content:
+      "Buổi hẹn đầu tiên, tim đập nhanh hơn bình thường gấp mấy lần. Bờ kè sông Sài Gòn, hai ly nước chưa kịp uống đã nguội vì mải nói chuyện. Một cuộc trò chuyện mà cả hai đều không muốn nó kết thúc.",
+    hiddenThought: "Mình đã chọn áo tới 3 lần trước khi ra cửa.",
+    mood: "happy",
+    image: capheImg,
+    hasVoiceNote: true,
     locked: false,
   },
   {

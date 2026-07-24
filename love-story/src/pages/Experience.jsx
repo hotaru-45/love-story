@@ -7,7 +7,9 @@ import HomeIntro from '../components/HomeIntro'
 import UnlockSystem from '../components/UnlockSystem'
 import ScrollDepthUnlocker from '../components/ScrollDepthUnlocker'
 import MusicToggle from '../components/MusicToggle'
+import MonthlyLoveLetter from '../components/MonthlyLoveLetter'
 import Footer from '../components/Footer'
+import LogoutButton from '../components/LogoutButton'
 
 const StoryEngine = lazy(() => import('../components/StoryEngine'))
 const TimelineMap = lazy(() => import('../components/TimelineMap'))
@@ -34,6 +36,7 @@ export default function Experience({ onRelock }) {
       }`}
     >
       <FloatingHearts />
+      <LogoutButton onRelock={onRelock} />
 
       <div className="relative z-10">
         <HomeIntro />
@@ -60,6 +63,7 @@ export default function Experience({ onRelock }) {
       </div>
 
       <MusicToggle />
+      <MonthlyLoveLetter />
       <Suspense fallback={null}>
         <MemoryAssistant onOpenStory={setStoryIndex} />
       </Suspense>

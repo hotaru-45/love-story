@@ -3,12 +3,12 @@ import PreferencesProvider from './components/PreferencesProvider'
 import PasswordGate from './components/PasswordGate'
 import UnlockProvider from './components/UnlockProvider'
 import Experience from './pages/Experience'
+import { useState } from 'react'
 import { usePreferences } from './hooks/preferencesContext'
-import { useLocalStorage } from './hooks/useLocalStorage'
 
 function Gate() {
   const { reducedMotion } = usePreferences()
-  const [unlocked, setUnlocked] = useLocalStorage('love_story_unlocked', false)
+  const [unlocked, setUnlocked] = useState(false)
 
   return (
     <MotionConfig reducedMotion={reducedMotion ? 'always' : 'never'}>
