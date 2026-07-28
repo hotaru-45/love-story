@@ -1,0 +1,22 @@
+type HashTag {
+  _id: ID
+  name: String
+  code: String
+  color: String
+  description: String
+}
+
+type HashTags {
+  data: [HashTag]
+  total: Int
+}
+
+type Query {
+  HashTags(select: select): HashTags
+}
+
+type Mutation {
+  HashTag_create(name: String!, color: String, description: String): HashTag
+  HashTag_update(_id: ID!, name: String, color: String, description: String): HashTag
+  HashTag_delete(_id: ID!): Boolean
+}

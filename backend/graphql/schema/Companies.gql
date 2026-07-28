@@ -1,0 +1,78 @@
+type Company {
+  _id: ID
+  id_tenant: String
+  code_company: String
+  name_company: String
+  address: String
+  phone_number: String
+  tax_code: String
+  note: String
+  password_expire: Int
+  max_login: Int
+  lockout_time: Int
+  is_complex_password: Boolean
+  password_length: Int
+  password_old: Int
+  created_at: Float
+  updated_at: Float
+  user_stats: CompanyUserStats
+  super_admins: [CompanySuperAdmin]
+}
+
+type CompanyUserStats {
+  total: Int
+  active: Int
+  super_admin: Int
+  last_login: Date
+}
+
+type CompanySuperAdmin {
+  _id: ID
+  username: String
+  full_name: String
+  status: Int
+}
+
+type Companies {
+  data: [Company]
+  total: Int
+}
+
+type Query {
+  Companies(select: select): Companies
+  Company(_id: ID!): Company
+}
+
+type Mutation {
+  Company_create(
+    code_company: String!
+    name_company: String
+    address: String
+    phone_number: String
+    tax_code: String
+    note: String
+    password_expire: Int
+    max_login: Int
+    lockout_time: Int
+    is_complex_password: Boolean
+    password_length: Int
+    password_old: Int
+  ): Company
+  Company_update(
+    _id: ID!
+    code_company: String
+    name_company: String
+    address: String
+    phone_number: String
+    tax_code: String
+    note: String
+    password_expire: Int
+    max_login: Int
+    lockout_time: Int
+    is_complex_password: Boolean
+    password_length: Int
+    password_old: Int
+  ): Company
+  Company_delete(_id: ID!): Boolean
+  Company_reset_super_admin_password(id_tenant: String!, user_id: ID!, password: String!): Boolean
+}

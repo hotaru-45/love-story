@@ -1,0 +1,43 @@
+type SystemLog {
+  _id: ID
+  user_id: String
+  user_name: String
+  user_role: String
+  user_email: String
+  action: String
+  module: String
+  details: String
+  entity: String
+  ip: String
+  status: String
+  request_method: String
+  request_endpoint: String
+  request_user_agent: String
+  changes: JSON
+  metadata: JSON
+  created_at: String
+}
+
+type SystemLogs {
+  data: [SystemLog]
+  total: Int
+}
+
+type SystemLogsStats {
+  total: Int
+  unique_users: Int
+  view_actions: Int
+  create_update_actions: Int
+  delete_actions: Int
+}
+
+type SystemLogExportFile {
+  filename: String
+  base64: String
+}
+
+type Query {
+  System_logs(select: select): SystemLogs
+  System_logs_stats: SystemLogsStats
+  System_logs_export(select: select): SystemLogExportFile
+}
