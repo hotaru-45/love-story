@@ -1,7 +1,7 @@
 import { lazy, Suspense, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
-import { stories } from '../data/storyData'
 import { usePreferences } from '../hooks/preferencesContext'
+import { useLoveStoryData } from '../hooks/loveStoryDataContext'
 import FloatingHearts from '../components/FloatingHearts'
 import HomeIntro from '../components/HomeIntro'
 import UnlockSystem from '../components/UnlockSystem'
@@ -26,6 +26,7 @@ function SectionSkeleton() {
 }
 
 export default function Experience({ onRelock }) {
+  const { stories } = useLoveStoryData()
   const [storyIndex, setStoryIndex] = useState(null)
   const { lite } = usePreferences()
 

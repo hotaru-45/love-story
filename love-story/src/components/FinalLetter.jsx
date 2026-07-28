@@ -1,8 +1,9 @@
 import { useRef, useState } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
-import { finalLetter, finalBackground } from '../data/storyData'
+import { useLoveStoryData } from '../hooks/loveStoryDataContext'
 
 export default function FinalLetter() {
+  const { finalLetter, finalBackground } = useLoveStoryData()
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '0px 0px -100px 0px' })
   const [opened, setOpened] = useState(false)

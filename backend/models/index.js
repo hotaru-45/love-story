@@ -25,23 +25,23 @@ module.exports = {
     RoleControl: (idTenant) => {
         return getModelByTenant(idTenant, 'role-controls', require('./schemas/T1002_RoleControl'));
     },
-    Stores: (idTenant) => {
-        return getModelByTenant(idTenant, 'stores', require('./schemas/T1003_Stores'));
-    },
     UploadFiles: (idTenant) => {
         return getModelByTenant(idTenant, 'upload-files', require('./schemas/T1004_UploadFiles'));
-    },
-    Rooms: (idTenant) => {
-        return getModelByTenant(idTenant, 'rooms', require('./schemas/T1005_Rooms'));
-    },
-    RoomActivities: (idTenant) => {
-        return getModelByTenant(idTenant, 'room-activities', require('./schemas/T1006_RoomActivities'));
     },
     SystemLogs: (idTenant) => {
         return getModelByTenant(idTenant, 'system-logs', require('./schemas/T1007_SystemLogs'));
     },
-    HashTags: (idTenant) => {
-        return getModelByTenant(idTenant, 'hash-tags', require('./schemas/T2000_HashTags'));
+    LoveStorySettings: (idTenant) => {
+        return getModelByTenant(idTenant, 'love-story-settings', require('./schemas/T2001_LoveStorySettings'));
+    },
+    StoryChapters: (idTenant) => {
+        return getModelByTenant(idTenant, 'story-chapters', require('./schemas/T2002_StoryChapters'));
+    },
+    GalleryPhotos: (idTenant) => {
+        return getModelByTenant(idTenant, 'gallery-photos', require('./schemas/T2003_GalleryPhotos'));
+    },
+    ChatMessages: (idTenant) => {
+        return getModelByTenant(idTenant, 'chat-messages', require('./schemas/T2004_ChatMessages'));
     },
 };
 

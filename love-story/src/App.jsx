@@ -1,7 +1,9 @@
 import { MotionConfig } from 'framer-motion'
 import { HashRouter, Navigate, Routes, Route, useNavigate } from 'react-router-dom'
+import { App as AntdApp, ConfigProvider } from 'antd'
 import PreferencesProvider from './components/PreferencesProvider'
 import UnlockProvider from './components/UnlockProvider'
+import LoveStoryDataProvider from './components/LoveStoryDataProvider'
 import Login from './pages/Login'
 import Experience from './pages/Experience'
 import { usePreferences } from './hooks/preferencesContext'
@@ -24,9 +26,15 @@ function HomeRoute() {
   }
 
   return (
-    <UnlockProvider>
-      <Experience onRelock={handleRelock} />
-    </UnlockProvider>
+    <ConfigProvider theme={{ token: { colorPrimary: '#fb7185', borderRadius: 16 } }}>
+      <AntdApp>
+        <LoveStoryDataProvider>
+          <UnlockProvider>
+            <Experience onRelock={handleRelock} />
+          </UnlockProvider>
+        </LoveStoryDataProvider>
+      </AntdApp>
+    </ConfigProvider>
   )
 }
 

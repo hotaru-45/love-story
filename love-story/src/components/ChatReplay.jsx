@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
-import { chatMessages, stories } from '../data/storyData'
+import { useLoveStoryData } from '../hooks/loveStoryDataContext'
 
 const TYPING_MS = 650
 const GAP_MS = 250
@@ -20,6 +20,7 @@ function TypingIndicator() {
 }
 
 export default function ChatReplay({ onOpenStory }) {
+  const { chatMessages, stories } = useLoveStoryData()
   const [expandedId, setExpandedId] = useState(null)
   const [visibleCount, setVisibleCount] = useState(0)
   const [typing, setTyping] = useState(false)

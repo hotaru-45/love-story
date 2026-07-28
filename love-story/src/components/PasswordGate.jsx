@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { anniversaryPassword } from '../data/storyData'
 import { usePreferences } from '../hooks/preferencesContext'
+import { useLoveStoryData } from '../hooks/loveStoryDataContext'
 import FloatingHearts from './FloatingHearts'
 
 function formatDateInput(raw) {
@@ -14,6 +14,7 @@ function formatDateInput(raw) {
 }
 
 export default function PasswordGate({ onUnlock }) {
+  const { anniversaryPassword } = useLoveStoryData()
   const { lite } = usePreferences()
   const [value, setValue] = useState('')
   const [wrong, setWrong] = useState(false)

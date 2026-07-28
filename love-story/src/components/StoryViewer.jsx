@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { moodMeta } from '../data/storyData'
+import { moodMeta } from '../data/moodMeta'
 
 const VOICE_NOTE_DURATION = 4500
 

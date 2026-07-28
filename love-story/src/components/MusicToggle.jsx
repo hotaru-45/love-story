@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { musicSrc, trackTitle } from '../data/storyData'
 import { usePreferences } from '../hooks/preferencesContext'
+import { useLoveStoryData } from '../hooks/loveStoryDataContext'
 
 export default function MusicToggle() {
+  const { musicSrc, trackTitle } = useLoveStoryData()
   const audioRef = useRef(null)
   const [playing, setPlaying] = useState(false)
   const { music } = usePreferences()

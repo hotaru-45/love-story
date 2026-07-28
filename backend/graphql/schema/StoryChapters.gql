@@ -1,0 +1,46 @@
+type StoryChapter {
+    _id: ID
+    date: String
+    title: String
+    content: String
+    hidden_thought: String
+    mood: String
+    image: String
+    has_voice_note: Boolean
+    locked: Boolean
+    sort_order: Int
+    FILE_IMAGE: File
+    created_at: String
+    updated_at: String
+}
+
+type Query {
+    Story_chapters: [StoryChapter]
+}
+
+type Mutation {
+    StoryChapter_create(
+        date: String
+        title: String
+        content: String
+        hidden_thought: String
+        mood: String
+        image: String
+        has_voice_note: Boolean
+        locked: Boolean
+        sort_order: Int
+    ): StoryChapter
+    StoryChapter_update(
+        _id: ID!
+        date: String
+        title: String
+        content: String
+        hidden_thought: String
+        mood: String
+        image: String
+        has_voice_note: Boolean
+        locked: Boolean
+        sort_order: Int
+    ): StoryChapter
+    StoryChapter_delete(_id: ID!): Boolean
+}

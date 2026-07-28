@@ -1,12 +1,13 @@
 // Backend là project GraphQL đa tenant dùng chung (`d:/LoveStory/backend`).
 // Website này chỉ có đúng 1 "công ty" (tenant) đại diện cho cặp đôi.
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3003'
-const COMPANY_CODE = 'LOVESTORY'
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3003'
+export const COMPANY_CODE = 'LOVESTORY'
 
 const LOGIN_QUERY = `
   query Login($code_company: String!, $username: String!, $password: String!) {
     login(code_company: $code_company, username: $username, password: $password) {
       token
+      id_tenant
     }
   }
 `
@@ -34,12 +35,13 @@ export async function loginRequest({ username, password }) {
       }),
     })
   } catch {
-    return { token: null, error: 'Không thể kết nối máy chủ, vui lòng thử lại.' }
+    return { token: null, tenant: null, error: 'Không thể kết nối máy chủ, vui lòng thử lại.' }
   }
 
   const json = await response.json().catch(() => null)
   const token = json?.data?.login?.token
-  if (token) return { token, error: null }
+  const tenant = json?.data?.login?.id_tenant
+  if (token) return { token, tenant, error: null }
 
-  return { token: null, error: mapLoginError(json?.errors?.[0]?.message) }
+  return { token: null, tenant: null, error: mapLoginError(json?.errors?.[0]?.message) }
 }

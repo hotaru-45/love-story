@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { secretCode, lockedChapterId, stories } from '../data/storyData'
 import { useUnlockSystem } from '../hooks/unlockContext'
+import { useLoveStoryData } from '../hooks/loveStoryDataContext'
 
 export default function UnlockSystem() {
+  const { secretCode, lockedChapterId, stories } = useLoveStoryData()
   const { lastUnlocked, clearToast, unlock, isUnlocked } = useUnlockSystem()
   const [code, setCode] = useState('')
   const [wrong, setWrong] = useState(false)
@@ -14,11 +15,11 @@ export default function UnlockSystem() {
     return () => clearTimeout(id)
   }, [lastUnlocked, clearToast])
   const lockedChapter = stories.find((s) => s.id === lockedChapterId)
-  const alreadyUnlocked = isUnlocked(lockedChapterId)
+  const alreadyUnlocked = !lockedChapterId || isUnlocked(lockedChapterId)
 
   function submitCode(e) {
     e.preventDefault()
-    if (code.trim().toLowerCase() === secretCode) {
+    if (lockedChapter && code.trim().toLowerCase() === secretCode) {
       unlock(lockedChapterId, lockedChapter.title)
       setCode('')
       setWrong(false)

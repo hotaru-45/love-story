@@ -1,5 +1,7 @@
-import { motion } from 'framer-motion'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { usePreferences } from '../hooks/preferencesContext'
+import ContentSettingsEditor from './ContentSettingsEditor'
 
 function Toggle({ label, checked, onChange }) {
   return (
@@ -29,6 +31,7 @@ function Toggle({ label, checked, onChange }) {
 export default function SettingsPanel({ onClose, onRelock }) {
   const { music, reducedMotion, performanceMode, setMusic, setReducedMotion, setPerformanceMode } =
     usePreferences()
+  const [contentEditorOpen, setContentEditorOpen] = useState(false)
 
   return (
     <motion.div
@@ -66,6 +69,14 @@ export default function SettingsPanel({ onClose, onRelock }) {
 
         <button
           type="button"
+          onClick={() => setContentEditorOpen(true)}
+          className="rounded-full bg-white/10 px-4 py-3 text-sm font-medium text-rose-100 hover:bg-white/20"
+        >
+          ✏️ Chỉnh sửa nội dung
+        </button>
+
+        <button
+          type="button"
           onClick={() => {
             onClose()
             onRelock?.()
@@ -75,6 +86,12 @@ export default function SettingsPanel({ onClose, onRelock }) {
           🔒 Khoá lại
         </button>
       </motion.div>
+
+      <AnimatePresence>
+        {contentEditorOpen && (
+          <ContentSettingsEditor onClose={() => setContentEditorOpen(false)} />
+        )}
+      </AnimatePresence>
     </motion.div>
   )
 }

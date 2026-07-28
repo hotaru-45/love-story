@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { coupleInfo } from '../data/storyData'
+import { useLoveStoryData } from '../hooks/loveStoryDataContext'
 
 function getElapsed(startDate) {
   const start = new Date(startDate).getTime()
@@ -34,12 +34,13 @@ function TimeUnit({ value, label, beat }) {
 }
 
 export default function LoveCounter({ compact = false }) {
+  const { coupleInfo } = useLoveStoryData()
   const [elapsed, setElapsed] = useState(() => getElapsed(coupleInfo.startDate))
 
   useEffect(() => {
     const id = setInterval(() => setElapsed(getElapsed(coupleInfo.startDate)), 1000)
     return () => clearInterval(id)
-  }, [])
+  }, [coupleInfo.startDate])
 
   return (
     <div className="animate-glow-pulse flex flex-col items-center gap-3 rounded-3xl p-4">

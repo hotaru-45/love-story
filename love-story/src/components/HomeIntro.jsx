@@ -1,13 +1,14 @@
 import { useRef, useState } from 'react'
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion'
-import { coupleInfo, loveQuotes, lockedChapterId, stories, heroBackground } from '../data/storyData'
 import { useTypewriterSequence } from '../hooks/useTypewriter'
 import { useUnlockSystem } from '../hooks/unlockContext'
+import { useLoveStoryData } from '../hooks/loveStoryDataContext'
 import LoveCounter from './LoveCounter'
 
 const LOGO_EASTER_EGG_THRESHOLD = 5
 
 export default function HomeIntro() {
+  const { coupleInfo, loveQuotes, lockedChapterId, stories, heroBackground } = useLoveStoryData()
   const sectionRef = useRef(null)
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end start'] })
   const blobY1 = useTransform(scrollYProgress, [0, 1], [0, 120])
@@ -26,7 +27,7 @@ export default function HomeIntro() {
     const next = logoClicks + 1
     setLogoClicks(next)
     if (next >= LOGO_EASTER_EGG_THRESHOLD) {
-      unlock(lockedChapterId, lockedChapter.title)
+      if (lockedChapter) unlock(lockedChapterId, lockedChapter.title)
       setLogoClicks(0)
     }
   }

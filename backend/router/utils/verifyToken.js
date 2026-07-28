@@ -3,10 +3,21 @@ const { DateTime } = require('luxon');
 const parseCookies = require('./parseCookies');
 const { SECRET, SECRET_MASTER } = require('../../constants');
 
+function queryParams(req) {
+  try {
+    return new URL(req.url, 'http://internal').searchParams;
+  } catch {
+    return null;
+  }
+}
+
 function verifyToken(req) {
-  const token = req?.headers?.token || parseCookies(req)?.token;
+  const query = queryParams(req);
+  // Query-param fallback: <img src> không gửi được custom header/cookie cross bối cảnh nào đó,
+  // nên /load-file cho phép truyền token+tenant qua query string.
+  const token = req?.headers?.token || parseCookies(req)?.token || query?.get('token');
   if (!token) return null;
-  const tenant = req?.headers?.tenant || parseCookies(req)?.tenant;
+  const tenant = req?.headers?.tenant || parseCookies(req)?.tenant || query?.get('tenant');
 
   try {
     const secrets = [];

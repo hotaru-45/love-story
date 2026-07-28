@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { stories } from '../data/storyData'
+import { useLoveStoryData } from '../hooks/loveStoryDataContext'
 
-// Trợ lý "AI" giả lập — không gọi API thật (app này không có backend), chỉ
-// chọn ngẫu nhiên một chapter có sẵn để gợi nhớ. Ghi rõ là mô phỏng, không
-// phải AI thật, để không gây hiểu lầm.
+// Trợ lý "AI" giả lập — không gọi API thật ngoài việc lấy dữ liệu chapter từ
+// BE, chỉ chọn ngẫu nhiên một chapter có sẵn để gợi nhớ. Ghi rõ là mô phỏng,
+// không phải AI thật, để không gây hiểu lầm.
 export default function MemoryAssistant({ onOpenStory }) {
+  const { stories } = useLoveStoryData()
   const [suggestion, setSuggestion] = useState(null)
 
   function recall() {

@@ -1,0 +1,20 @@
+type ChatMessage {
+    _id: ID
+    sender: String
+    text: String
+    time: String
+    story_id: String
+    sort_order: Int
+    created_at: String
+    updated_at: String
+}
+
+type Query {
+    Chat_messages: [ChatMessage]
+}
+
+type Mutation {
+    ChatMessage_create(sender: String, text: String, time: String, story_id: String, sort_order: Int): ChatMessage
+    ChatMessage_update(_id: ID!, sender: String, text: String, time: String, story_id: String, sort_order: Int): ChatMessage
+    ChatMessage_delete(_id: ID!): Boolean
+}

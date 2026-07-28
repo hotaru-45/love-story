@@ -1,10 +1,14 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { stories, moodMeta, galleryPhotos } from '../data/storyData'
+import { App as AntdApp, Popconfirm } from 'antd'
+import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons'
+import { moodMeta } from '../data/moodMeta'
 import { useUnlockSystem } from '../hooks/unlockContext'
+import { useLoveStoryData } from '../hooks/loveStoryDataContext'
 import MemoryViewer from './MemoryViewer'
+import GalleryPhotoEditor from './GalleryPhotoEditor'
 
-function PhotoLightbox({ photo, onClose }) {
+function PhotoLightbox({ photo, onClose, onEdit, onDelete }) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -21,15 +25,34 @@ function PhotoLightbox({ photo, onClose }) {
         onClick={(e) => e.stopPropagation()}
       >
         <img src={photo.src} alt={photo.caption} className="max-h-[70vh] w-full object-cover" />
-        <div className="flex items-center justify-between p-4">
+        <div className="flex items-center justify-between gap-2 p-4">
           <p className="text-sm text-rose-100">{photo.caption}</p>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-full bg-white/15 px-3 py-1.5 text-xs font-medium text-rose-100 hover:bg-white/25"
-          >
-            ✕ Đóng
-          </button>
+          <div className="flex shrink-0 gap-2">
+            <button
+              type="button"
+              onClick={() => onEdit(photo)}
+              aria-label="Sửa ảnh"
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-white/15 text-white hover:bg-white/25"
+            >
+              <EditOutlined />
+            </button>
+            <Popconfirm title="Xoá ảnh này?" okText="Xoá" cancelText="Huỷ" onConfirm={() => onDelete(photo.id)}>
+              <button
+                type="button"
+                aria-label="Xoá ảnh"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-white/15 text-white hover:bg-red-600/80"
+              >
+                <DeleteOutlined />
+              </button>
+            </Popconfirm>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-full bg-white/15 px-3 py-1.5 text-xs font-medium text-rose-100 hover:bg-white/25"
+            >
+              ✕ Đóng
+            </button>
+          </div>
         </div>
       </motion.div>
     </motion.div>
@@ -37,12 +60,26 @@ function PhotoLightbox({ photo, onClose }) {
 }
 
 export default function MemoryGallery() {
+  const { stories, galleryPhotos, deleteGalleryPhoto } = useLoveStoryData()
+  const { message } = AntdApp.useApp()
   const [activeId, setActiveId] = useState(null)
   const [activePhotoId, setActivePhotoId] = useState(null)
+  const [editingPhoto, setEditingPhoto] = useState(null)
+  const [addingPhoto, setAddingPhoto] = useState(false)
   const { isUnlocked } = useUnlockSystem()
   const visibleStories = stories.filter((s) => !s.locked || isUnlocked(s.id))
   const activeIndex = stories.findIndex((s) => s.id === activeId)
   const activePhoto = galleryPhotos.find((p) => p.id === activePhotoId)
+
+  async function handleDeletePhoto(id) {
+    try {
+      await deleteGalleryPhoto(id)
+      setActivePhotoId(null)
+      message.success('Đã xoá ảnh')
+    } catch (err) {
+      message.error(err.message || 'Xoá thất bại')
+    }
+  }
 
   return (
     <section id="gallery" className="px-6 py-20">
@@ -86,29 +123,35 @@ export default function MemoryGallery() {
         })}
       </div>
 
+      <div className="mx-auto mt-14 flex max-w-3xl items-center justify-center gap-3">
+        <h3 className="text-center text-lg font-medium text-rose-100">📷 Ảnh kỷ niệm khác</h3>
+        <button
+          type="button"
+          onClick={() => setAddingPhoto(true)}
+          className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 text-xs font-medium text-white hover:bg-white/25"
+        >
+          <PlusOutlined /> Thêm ảnh
+        </button>
+      </div>
+
       {galleryPhotos.length > 0 && (
-        <>
-          <h3 className="mx-auto mt-14 max-w-3xl text-center text-lg font-medium text-rose-100">
-            📷 Ảnh kỷ niệm khác
-          </h3>
-          <div className="mx-auto mt-6 grid max-w-3xl grid-cols-3 gap-2 sm:gap-3">
-            {galleryPhotos.map((photo) => (
-              <button
-                key={photo.id}
-                type="button"
-                onClick={() => setActivePhotoId(photo.id)}
-                className="group aspect-square overflow-hidden rounded-xl bg-white/10 shadow-sm"
-              >
-                <img
-                  src={photo.src}
-                  alt={photo.caption}
-                  loading="lazy"
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-              </button>
-            ))}
-          </div>
-        </>
+        <div className="mx-auto mt-6 grid max-w-3xl grid-cols-3 gap-2 sm:gap-3">
+          {galleryPhotos.map((photo) => (
+            <button
+              key={photo.id}
+              type="button"
+              onClick={() => setActivePhotoId(photo.id)}
+              className="group aspect-square overflow-hidden rounded-xl bg-white/10 shadow-sm"
+            >
+              <img
+                src={photo.src}
+                alt={photo.caption}
+                loading="lazy"
+                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+            </button>
+          ))}
+        </div>
       )}
 
       {activeIndex !== -1 && (
@@ -117,9 +160,20 @@ export default function MemoryGallery() {
 
       <AnimatePresence>
         {activePhoto && (
-          <PhotoLightbox photo={activePhoto} onClose={() => setActivePhotoId(null)} />
+          <PhotoLightbox
+            photo={activePhoto}
+            onClose={() => setActivePhotoId(null)}
+            onEdit={(photo) => {
+              setActivePhotoId(null)
+              setEditingPhoto(photo)
+            }}
+            onDelete={handleDeletePhoto}
+          />
         )}
       </AnimatePresence>
+
+      <GalleryPhotoEditor open={addingPhoto} photo={null} onClose={() => setAddingPhoto(false)} />
+      <GalleryPhotoEditor open={Boolean(editingPhoto)} photo={editingPhoto} onClose={() => setEditingPhoto(null)} />
     </section>
   )
 }

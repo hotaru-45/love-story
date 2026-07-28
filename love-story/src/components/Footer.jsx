@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
-import { footerInfo } from '../data/storyData'
+import { useLoveStoryData } from '../hooks/loveStoryDataContext'
 import SettingsPanel from './SettingsPanel'
 
 export default function Footer({ onRelock }) {
+  const { footerInfo } = useLoveStoryData()
   const [settingsOpen, setSettingsOpen] = useState(false)
 
   return (

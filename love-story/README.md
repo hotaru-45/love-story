@@ -21,21 +21,27 @@ love-story/
 │  └─ music/                   # bỏ file nhạc nền vào đây (bg-music.mp3)
 ├─ src/
 │  ├─ data/
-│  │  └─ storyData.js          # ✏️ TOÀN BỘ nội dung: chapters, chat, mã bí mật, thư cuối
+│  │  └─ moodMeta.js            # emoji/label/gradient theo mood (thuần UI, tĩnh)
 │  ├─ hooks/
 │  │  ├─ useTypewriter.js       # typewriter 1 dòng + sequence nhiều dòng
 │  │  ├─ useLocalStorage.js     # lưu note/emotion trên máy người dùng
-│  │  └─ unlockContext.js       # context + hook useUnlockSystem() + chime âm thanh
+│  │  ├─ unlockContext.js       # context + hook useUnlockSystem() + chime âm thanh
+│  │  └─ loveStoryDataContext.js# context + hook useLoveStoryData() — toàn bộ nội dung từ BE
 │  ├─ components/
 │  │  ├─ HomeIntro.jsx          # cinematic landing, typewriter, zoom transition
 │  │  ├─ StoryEngine.jsx        # ⭐ Story World: chapter cuộn dọc, Ken Burns, rewind, hidden layer
+│  │  │                         #    + thêm/sửa/xoá/đổi ảnh chapter ngay tại chỗ
+│  │  ├─ StoryChapterEditor.jsx # modal thêm/sửa 1 chapter (ảnh, mood, nội dung...)
 │  │  ├─ TimelineMap.jsx        # ⭐ Memory Map: node khoá/mở, heart ẩn
 │  │  ├─ UnlockSystem.jsx       # ⭐ ô nhập mã bí mật + toast "achievement unlocked"
 │  │  ├─ UnlockProvider.jsx     # provider giữ state unlock (đã tách khỏi hook để hỗ trợ Fast Refresh)
-│  │  ├─ MemoryGallery.jsx      # ⭐ grid ảnh immersive
+│  │  ├─ LoveStoryDataProvider.jsx # fetch 1 lần toàn bộ nội dung từ BE + expose CRUD helpers
+│  │  ├─ MemoryGallery.jsx      # ⭐ grid ảnh immersive + thêm/sửa/xoá ảnh
+│  │  ├─ GalleryPhotoEditor.jsx # modal thêm/sửa 1 ảnh gallery
 │  │  ├─ MemoryViewer.jsx       # zoom/pan, overlay story, emotion slider, add note
 │  │  ├─ ChatReplay.jsx         # ⭐ fake chat, typing indicator, reveal tuần tự
 │  │  ├─ FinalLetter.jsx        # ⭐ thư cuối, mở khi cuộn tới cuối, zoom-out ấm áp
+│  │  ├─ ContentSettingsEditor.jsx # modal chỉnh coupleInfo/quotes/thư cuối/chat (mở từ ⚙️ Cài đặt)
 │  │  ├─ StoryViewer.jsx        # modal chi tiết dùng chung (progress bar, swipe, voice note)
 │  │  ├─ LoveCounter.jsx        # đếm realtime + heartbeat + glow pulse mỗi giây
 │  │  ├─ ScrollDepthUnlocker.jsx# sentinel vô hình — cuộn tới đây tự unlock chapter bí mật
@@ -48,7 +54,8 @@ love-story/
 │  │  └─ Experience.jsx         # ráp toàn bộ trải nghiệm thành 1 trang cuộn liên tục
 │  ├─ utils/
 │  │  ├─ api.js                 # gọi GraphQL `login` tới backend
-│  │  └─ auth.js                # lưu/đọc/xoá token đăng nhập (localStorage)
+│  │  ├─ auth.js                # lưu/đọc/xoá token + tenant đăng nhập (localStorage)
+│  │  └─ loveStoryApi.js        # client GraphQL cho toàn bộ nội dung (chapters/gallery/chat/settings) + upload ảnh
 │  ├─ styles/
 │  │  └─ index.css              # Tailwind + keyframes (heartbeat, ken-burns, glow-pulse, ...)
 │  ├─ App.jsx                   # React Router: "/" (Login) và "/home" (Experience, cần đăng nhập)
@@ -61,15 +68,15 @@ love-story/
 
 ## 🎮 UnlockSystem — lớp gamification
 
-Có **1 chapter bonus bị khoá** (chapter cuối, `locked: true` trong
-`storyData.js`) — các kỷ niệm thật không bị khoá, để không làm khó người
-nhận quà. Chapter bonus này mở được qua **4 cách độc lập** (làm 1 trong 4 là đủ):
+Có thể có **chapter bonus bị khoá** (`locked: true`) — các kỷ niệm thật
+không nên khoá, để không làm khó người nhận quà. Chapter khoá mở được qua
+**4 cách độc lập** (làm 1 trong 4 là đủ):
 
 1. Bấm logo "💌 Chuyện Của Chúng Mình" ở Home 5 lần.
 2. Bấm vào "heart ẩn" (✨ mờ, opacity thấp) ở cuối Memory Map.
 3. Cuộn đủ sâu trang (qua `ScrollDepthUnlocker`, tự động, không cần bấm gì).
-4. Nhập đúng mã bí mật (mặc định `ourstory`, đổi ở `secretCode` trong data)
-   vào ô "🔐 Bạn biết mã bí mật?" gần Memory Map.
+4. Nhập đúng mã bí mật (mặc định `ourstory`, đổi ở tab "Thông tin chung" của
+   trình chỉnh sửa nội dung) vào ô "🔐 Bạn biết mã bí mật?" gần Memory Map.
 
 Mở khoá xong sẽ có toast "🏆 Đã mở khoá..." + glow + một tiếng "ding" nhỏ
 (tạo bằng Web Audio API, không cần file âm thanh thật). Trạng thái unlock
@@ -77,14 +84,22 @@ lưu trong `localStorage` nên không mất khi load lại trang.
 
 ## ✏️ Tuỳ chỉnh nội dung
 
-Mở **`src/data/storyData.js`**:
+Toàn bộ nội dung (chapters, ảnh gallery, tin nhắn chat, thông tin cặp đôi,
+quote, thư cuối, mã bí mật...) giờ được lưu ở backend (`../backend`, xem
+`T2001_LoveStorySettings` → `T2004_ChatMessages` trong `backend/models/schemas`)
+thay vì hardcode trong FE. Chỉnh trực tiếp trong app, không cần sửa code:
 
-- `coupleInfo`: tên, `startDate`, `tagline` (mảng 2 dòng cho intro typewriter).
-- `stories`: mỗi chapter có `date`, `title`, `content`, `hiddenThought` (dòng
-  suy nghĩ ẩn hiện khi bấm vào chapter trong Story World), `mood`, `image`
-  (để `null` thì dùng gradient placeholder theo mood), `hasVoiceNote`, `locked`.
-- `lockedChapterId` / `secretCode`: chapter nào bị khoá và mã mở khoá.
-- `chatMessages`, `loveQuotes`, `finalLetter`, `musicSrc`/`trackTitle`.
+- **Chapters**: nút "➕ Thêm chương mới" trong Story World, hoặc icon ✏️/🗑️
+  ở góc mỗi chapter để sửa/xoá (đổi ảnh bằng cách chọn ảnh mới trong form).
+- **Ảnh gallery rời**: nút "➕ Thêm ảnh" cạnh "📷 Ảnh kỷ niệm khác", hoặc
+  ✏️/🗑️ khi mở 1 ảnh để xem lớn.
+- **Thông tin chung / chat**: nút "⚙️ Cài đặt" ở footer → "✏️ Chỉnh sửa nội
+  dung" — sửa `coupleInfo`, mật khẩu ngày kỷ niệm, mã bí mật, ảnh nền, quote,
+  thư cuối, và thêm/sửa/xoá từng tin nhắn chat.
+
+Lần đầu chạy backend (`node server.js` trong `../backend`) sẽ tự seed lại
+đúng nội dung cũ (8 chapter, 6 ảnh, chat, thư cuối) từ dữ liệu gốc — xem
+`backend/imports/seedLoveStoryContent.js`.
 
 ## 🚀 Chạy local
 

@@ -1,0 +1,10 @@
+type LoveStoryPage {
+    settings: LoveStorySettings
+    stories: [StoryChapter]
+    gallery: [GalleryPhoto]
+    chat: [ChatMessage]
+}
+
+type Query {
+    LoveStory_page: LoveStoryPage
+}

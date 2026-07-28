@@ -3,13 +3,12 @@
 //  đúng ngày (trong tháng) mà hai người gặp nhau, mỗi tháng một lần.
 //  Đổi ngày, bật/tắt, hoặc thêm thư theo tháng ở file này.
 // ============================================================
-import { coupleInfo } from "./storyData";
-
 // Ngày hai người gặp nhau — chỉ phần ngày (dd) được dùng để tính lại
-// "ngày kỷ niệm" mỗi tháng, không phụ thuộc vào năm.
-// Mặc định lấy theo coupleInfo.startDate để không bị lệch với LoveCounter.
+// "ngày kỷ niệm" mỗi tháng, không phụ thuộc vào năm. `coupleInfo.startDate`
+// giờ được quản lý ở BE (xem Settings), còn giá trị dưới đây chỉ là fallback
+// tĩnh khớp với ngày bắt đầu ban đầu — đổi tay ở đây nếu ngày đó đổi.
 export const loveLetterConfig = {
-  anniversaryDate: coupleInfo.startDate.slice(0, 10), // 'YYYY-MM-DD'
+  anniversaryDate: "2025-12-24", // 'YYYY-MM-DD'
 };
 
 // Cờ điều khiển tính năng.

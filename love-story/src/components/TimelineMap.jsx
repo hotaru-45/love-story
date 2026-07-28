@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
-import { stories, moodMeta, lockedChapterId } from '../data/storyData'
+import { moodMeta } from '../data/moodMeta'
 import { useUnlockSystem } from '../hooks/unlockContext'
+import { useLoveStoryData } from '../hooks/loveStoryDataContext'
 
 function MapNode({ story, index, onOpen }) {
   const theme = moodMeta[story.mood]
@@ -42,9 +43,10 @@ function MapNode({ story, index, onOpen }) {
 }
 
 function HiddenHeartNode() {
+  const { stories, lockedChapterId } = useLoveStoryData()
   const { unlock, isUnlocked } = useUnlockSystem()
   const target = stories.find((s) => s.id === lockedChapterId)
-  if (isUnlocked(lockedChapterId)) return null
+  if (!target || isUnlocked(lockedChapterId)) return null
 
   return (
     <button
@@ -59,6 +61,7 @@ function HiddenHeartNode() {
 }
 
 export default function TimelineMap({ onOpen }) {
+  const { stories } = useLoveStoryData()
   return (
     <section id="timeline-map" className="relative px-6 py-20">
       <h2 className="text-center text-2xl font-semibold text-white sm:text-3xl">

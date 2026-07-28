@@ -1,9 +1,13 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { stories, moodMeta } from '../data/storyData'
+import { App as AntdApp, Popconfirm } from 'antd'
+import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons'
+import { moodMeta } from '../data/moodMeta'
 import { useUnlockSystem } from '../hooks/unlockContext'
+import { useLoveStoryData } from '../hooks/loveStoryDataContext'
+import StoryChapterEditor from './StoryChapterEditor'
 
-function Chapter({ story, index, onOpen }) {
+function Chapter({ story, index, onOpen, onEdit, onDelete }) {
   const theme = moodMeta[story.mood]
   const { isUnlocked } = useUnlockSystem()
   const [revealed, setRevealed] = useState(false)
@@ -16,6 +20,32 @@ function Chapter({ story, index, onOpen }) {
       onClick={() => !locked && setRevealed((r) => !r)}
       className="relative flex min-h-svh w-full flex-col items-center justify-center overflow-hidden px-6 py-24 text-center"
     >
+      <div className="absolute right-4 top-4 z-10 flex gap-2" onClick={(e) => e.stopPropagation()}>
+        <button
+          type="button"
+          onClick={() => onEdit(story)}
+          aria-label="Sửa chương"
+          className="flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur hover:bg-black/60"
+        >
+          <EditOutlined />
+        </button>
+        <Popconfirm
+          title="Xoá chương này?"
+          description="Không thể hoàn tác."
+          okText="Xoá"
+          cancelText="Huỷ"
+          onConfirm={() => onDelete(story.id)}
+        >
+          <button
+            type="button"
+            aria-label="Xoá chương"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur hover:bg-red-600/80"
+          >
+            <DeleteOutlined />
+          </button>
+        </Popconfirm>
+      </div>
+
       <div
         onPointerDown={() => setRewinding(true)}
         onPointerUp={() => setRewinding(false)}
@@ -107,6 +137,20 @@ function Chapter({ story, index, onOpen }) {
 }
 
 export default function StoryEngine({ onOpen }) {
+  const { stories, deleteStory } = useLoveStoryData()
+  const { message } = AntdApp.useApp()
+  const [editing, setEditing] = useState(null) // story | null khi sửa, undefined khi đóng
+  const [adding, setAdding] = useState(false)
+
+  async function handleDelete(id) {
+    try {
+      await deleteStory(id)
+      message.success('Đã xoá chương')
+    } catch (err) {
+      message.error(err.message || 'Xoá thất bại')
+    }
+  }
+
   return (
     <section id="story-engine" className="relative">
       <div className="px-6 pt-16 text-center">
@@ -115,11 +159,28 @@ export default function StoryEngine({ onOpen }) {
           Cuộn xuống để bước qua từng chương. Bấm để xem suy nghĩ ẩn, nhấn giữ ảnh nền để
           &quot;tua lại&quot; ký ức.
         </p>
+        <button
+          type="button"
+          onClick={() => setAdding(true)}
+          className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-white/15 px-4 py-2 text-sm font-medium text-white hover:bg-white/25"
+        >
+          <PlusOutlined /> Thêm chương mới
+        </button>
       </div>
 
       {stories.map((story, idx) => (
-        <Chapter key={story.id} story={story} index={idx} onOpen={onOpen} />
+        <Chapter
+          key={story.id}
+          story={story}
+          index={idx}
+          onOpen={onOpen}
+          onEdit={setEditing}
+          onDelete={handleDelete}
+        />
       ))}
+
+      <StoryChapterEditor open={adding} story={null} onClose={() => setAdding(false)} />
+      <StoryChapterEditor open={Boolean(editing)} story={editing} onClose={() => setEditing(null)} />
     </section>
   )
 }

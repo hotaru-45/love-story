@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { moodMeta } from '../data/storyData'
+import { moodMeta } from '../data/moodMeta'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 
 const EMOTION_STOPS = ['😢', '😐', '🙂', '😄', '🥰']

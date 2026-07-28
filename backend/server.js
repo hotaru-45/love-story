@@ -14,6 +14,7 @@ const router = require('./router');
 const { UserMasters, Companies, Users } = require('./models');
 const { SECRET, SECRET_MASTER } = require('./constants');
 const { hashPassword } = require('./graphql/utils/passwordHash');
+const { seedLoveStoryContent } = require('./seed/seedLoveStoryContent');
 
 const EventEmitter = require('node:events');
 const logger = require('./logger');
@@ -106,6 +107,12 @@ async function seedCoupleAccount() {
   logger.info(`Seeded user "${COUPLE_USERNAME}" for tenant ${COUPLE_COMPANY_CODE}`);
 }
 
+async function seedCoupleContent() {
+  const company = await Companies().findOne({ code_company: COUPLE_COMPANY_CODE }).lean();
+  if (!company) return;
+  await seedLoveStoryContent(company.id_tenant);
+}
+
 async function setup() {
   mongoose
     .connect(process.env.MONGODB_DATA_URL)
@@ -124,7 +131,9 @@ async function setup() {
           ]);
         });
 
-      seedCoupleAccount().catch((err) => logger.error(err.stack ? err.stack : err.message));
+      seedCoupleAccount()
+        .then(() => seedCoupleContent())
+        .catch((err) => logger.error(err.stack ? err.stack : err.message));
     })
     .catch((err) => logger.error(err.stack ? err.stack : err.message));
 }

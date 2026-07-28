@@ -19,19 +19,15 @@ import {
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import "dayjs/locale/vi";
-import {
-  anniversaryPassword,
-  coupleInfo,
-  heroBackground,
-} from "../../data/storyData";
 import { setAuthenticated } from "../../utils/auth";
 import { loginRequest } from "../../utils/api";
+import { fetchPublicSettings, fileUrl } from "../../utils/loveStoryApi";
 
 dayjs.locale("vi");
 
 // Tài khoản đăng nhập được xác thực thật qua GraphQL (backend), xem `utils/api.js`.
-// Ngày quan trọng là lớp kiểm tra riêng ở FE (backend hiện chưa có field này),
-// dùng chung mốc kỷ niệm khai báo trong storyData.
+// Ngày quan trọng là lớp kiểm tra riêng ở FE, giá trị lấy từ
+// `LoveStory_public_settings` (BE) thay vì hardcode trong bundle như trước.
 const MEETING_DATE_FORMAT = "DD/MM/YYYY";
 
 // Đổi thay xoay vòng ở góc dưới ảnh — chỉ là gia vị cảm xúc, không ảnh hưởng logic.
@@ -47,7 +43,7 @@ const LOVE_QUOTES = [
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-function isMeetingDateValid(meetingDate) {
+function isMeetingDateValid(meetingDate, anniversaryPassword) {
   return Boolean(meetingDate) && meetingDate.format(MEETING_DATE_FORMAT) === anniversaryPassword;
 }
 
@@ -112,10 +108,12 @@ function useRotatingQuote() {
   return { quote: LOVE_QUOTES[index], visible };
 }
 
-function LeftShowcase() {
+function LeftShowcase({ coupleInfo, heroBackground }) {
   const now = useLiveClock();
   const { quote, visible } = useRotatingQuote();
-  const togetherSince = dayjs(coupleInfo.startDate).format(MEETING_DATE_FORMAT);
+  const togetherSince = coupleInfo.startDate
+    ? dayjs(coupleInfo.startDate).format(MEETING_DATE_FORMAT)
+    : "";
 
   return (
     <div className="relative h-[38vh] w-full shrink-0 overflow-hidden md:h-full md:w-[55%] lg:w-[60%]">
@@ -180,7 +178,7 @@ function LeftShowcase() {
   );
 }
 
-function LoginCard() {
+function LoginCard({ anniversaryPassword }) {
   const navigate = useNavigate();
   const { notification } = AntdApp.useApp();
   const [form] = Form.useForm();
@@ -190,7 +188,7 @@ function LoginCard() {
   const canSubmit = isFormValid(values);
 
   async function handleLogin(formValues) {
-    if (!isMeetingDateValid(formValues.meetingDate)) {
+    if (!isMeetingDateValid(formValues.meetingDate, anniversaryPassword)) {
       notification.error({
         title: "Không thể đăng nhập",
         description: "Ngày đầu tiên gặp nhau chưa đúng ❤️",
@@ -200,7 +198,7 @@ function LoginCard() {
     }
 
     setSubmitting(true);
-    const { token, error } = await validateCredential(
+    const { token, tenant, error } = await validateCredential(
       formValues.username,
       formValues.password
     );
@@ -215,7 +213,7 @@ function LoginCard() {
       return;
     }
 
-    setAuthenticated(token);
+    setAuthenticated(token, tenant);
     await wait(800);
     notification.success({
       title: "Chào mừng trở về 🤍",
@@ -320,12 +318,44 @@ function LoginCard() {
   );
 }
 
+const DEFAULT_COUPLE_INFO = { person1: "", person2: "", startDate: "" };
+
+function usePublicSettings() {
+  const [settings, setSettings] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchPublicSettings()
+      .then((data) => {
+        if (!cancelled) setSettings(data);
+      })
+      .catch(() => {
+        if (!cancelled) setSettings({});
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return {
+    coupleInfo: {
+      person1: settings?.couple_person1 || DEFAULT_COUPLE_INFO.person1,
+      person2: settings?.couple_person2 || DEFAULT_COUPLE_INFO.person2,
+      startDate: settings?.start_date || DEFAULT_COUPLE_INFO.startDate,
+    },
+    heroBackground: fileUrl(settings?.FILE_HERO_BACKGROUND),
+    anniversaryPassword: settings?.anniversary_password || "",
+  };
+}
+
 function LoginScreen() {
+  const { coupleInfo, heroBackground, anniversaryPassword } = usePublicSettings();
+
   return (
     <div className="relative flex h-dvh w-full flex-col overflow-y-auto bg-white md:h-screen md:flex-row md:overflow-hidden">
-      <LeftShowcase />
+      <LeftShowcase coupleInfo={coupleInfo} heroBackground={heroBackground} />
       <div className="flex w-full flex-1 items-center justify-center bg-gradient-to-br from-white via-white to-rose-50/70 px-6 py-10 sm:px-10 md:w-[45%] md:overflow-y-auto lg:w-[40%]">
-        <LoginCard />
+        <LoginCard anniversaryPassword={anniversaryPassword} />
       </div>
     </div>
   );

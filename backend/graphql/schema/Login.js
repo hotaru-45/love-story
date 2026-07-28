@@ -1,12 +1,12 @@
 const jws = require('jws');
 const { randomBytes } = require('crypto');
 const { DateTime } = require('luxon');
-const { SECRET, SECRET_MASTER, MASTER_LOGIN, MANAGER_ORG } = require('../../constants');
+const { SECRET, SECRET_MASTER, MASTER_LOGIN } = require('../../constants');
 const { verifyPassword } = require('../utils/passwordHash');
 const { hmacSHA512Hex, safeEqualHex } = require('../utils/hmac');
 const { composeResolvers } = require('@graphql-tools/resolvers-composition');
 const auth = require('../auth');
-const { Users, UserMasters, BlockLoginAccess, Companies, RoleControl, Stores, LogLogin } = require('../../models');
+const { Users, UserMasters, BlockLoginAccess, Companies, RoleControl, LogLogin } = require('../../models');
 const graphqlFields = require('../utils/graphql-fields');
 const { sanitizeHeaders, sanitizeToken } = require('../utils/sanitizeLog');
 const { logSystemActivity } = require('../utils/systemLog');
@@ -111,8 +111,6 @@ const resolvers = {
         delete result.created_at;
         delete result.updated_at;
         delete result.__v;
-
-        const store = await Stores(context.tenant).findOne({ code_store: data?.code_store }).lean();
 
         if (!data.is_super_admin) {
           const isMobile = info.fieldNodes[0]?.alias?.value?.includes('mobi_');

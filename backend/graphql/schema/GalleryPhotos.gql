@@ -1,0 +1,19 @@
+type GalleryPhoto {
+    _id: ID
+    src: String
+    caption: String
+    sort_order: Int
+    FILE_SRC: File
+    created_at: String
+    updated_at: String
+}
+
+type Query {
+    Gallery_photos: [GalleryPhoto]
+}
+
+type Mutation {
+    GalleryPhoto_create(src: String, caption: String, sort_order: Int): GalleryPhoto
+    GalleryPhoto_update(_id: ID!, src: String, caption: String, sort_order: Int): GalleryPhoto
+    GalleryPhoto_delete(_id: ID!): Boolean
+}

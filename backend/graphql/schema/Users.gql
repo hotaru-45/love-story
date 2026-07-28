@@ -10,57 +10,17 @@ type User {
   role: String
   is_super_admin: Boolean
   is_display: Boolean
-  store_id: String
   permission: String
   status: Int
-  rooms: Int
-  hashtag_ids: [String]
-  hashtags: [HashTag]
   FILE_AVATAR: File
-  STORE: Store
   LAST_ACTIVE: Date
 }
 
-type Users {
-  data: [User]
-  total: Int
-}
-
-type UsersStats {
-  total: Int
-  online: Int
-  managers: Int
-  suspended: Int
-}
-
-type UserExportFile {
-  filename: String
-  base64: String
-}
-
 type Query {
-  Users(select: select): Users
   User (_id: ID): User
-  Users_export(select: select): UserExportFile
-  Users_stats: UsersStats
 }
 
 type Mutation {
-  User_create(
-    code: String
-    username: String
-    password: String
-    full_name: String
-    mail: String
-    phone: String
-    avatar: String
-    infor: JSON
-    role: String!
-    store_id: String
-    permission: String
-    rooms: Int
-    hashtag_ids: [String]
-  ): User
   User_self_update(
     password: String
     old_password: String
@@ -70,22 +30,4 @@ type Mutation {
     avatar: String
     infor: JSON
   ): User
-  Admin_update_user(
-    _id: ID!
-    code: String
-    username: String
-    password: String
-    full_name: String
-    mail: String
-    phone: String
-    avatar: String
-    infor: JSON
-    role: String!
-    store_id: String
-    permission: String
-    status: Int
-    rooms: Int
-    hashtag_ids: [String]
-  ): User
-  User_delete(_id: ID!): Boolean
 }

@@ -1,0 +1,58 @@
+type LoveStorySettings {
+    _id: ID
+    couple_person1: String
+    couple_person2: String
+    start_date: String
+    tagline: [String]
+    anniversary_password: String
+    secret_code: String
+    hero_background: String
+    final_background: String
+    love_quotes: [String]
+    final_letter_intro: [String]
+    final_letter_title: String
+    final_letter_paragraphs: [String]
+    final_letter_signature: String
+    footer_made_by: String
+    music_src: String
+    track_title: String
+    FILE_HERO_BACKGROUND: File
+    FILE_FINAL_BACKGROUND: File
+    created_at: String
+    updated_at: String
+}
+
+type LoveStoryPublicSettings {
+    couple_person1: String
+    couple_person2: String
+    start_date: String
+    tagline: [String]
+    anniversary_password: String
+    FILE_HERO_BACKGROUND: File
+}
+
+type Query {
+    LoveStory_settings: LoveStorySettings
+    LoveStory_public_settings(code_company: String!): LoveStoryPublicSettings
+}
+
+type Mutation {
+    LoveStorySettings_update(
+        couple_person1: String
+        couple_person2: String
+        start_date: String
+        tagline: [String]
+        anniversary_password: String
+        secret_code: String
+        hero_background: String
+        final_background: String
+        love_quotes: [String]
+        final_letter_intro: [String]
+        final_letter_title: String
+        final_letter_paragraphs: [String]
+        final_letter_signature: String
+        footer_made_by: String
+        music_src: String
+        track_title: String
+    ): LoveStorySettings
+}
