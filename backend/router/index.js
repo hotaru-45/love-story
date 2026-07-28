@@ -29,6 +29,11 @@ const router = require('find-my-way')({
   },
 });
 
+//------------------------------Health check----------------------------------------------
+router.on('GET', '/healthz', (req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' }).end('ok');
+});
+
 router.on('OPTIONS', '*', (req, res, params) => {
   setCors(req, res);
   res.writeHead(204, {

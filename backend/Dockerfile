@@ -1,7 +1,13 @@
-FROM node:latest
+FROM node:24-slim
 
 WORKDIR /data
-COPY ./ ./
 
-EXPOSE 3000
-CMD [ "node", "./server.js" ]
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
+
+COPY . .
+
+ENV NODE_ENV=production
+EXPOSE 3003
+
+CMD ["node", "server.js"]

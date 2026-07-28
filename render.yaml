@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: lovestory-backend
+    runtime: docker
+    plan: free
+    rootDir: backend
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3003
+      - key: NAME_APP
+        value: nexora
+      - key: COMPRESSION
+        value: "false"
+      - key: CORS_ORIGINS
+        value: https://hotaru-45.github.io
+      - key: MONGODB_DATA_URL
+        sync: false
+      - key: SECRET_TOKEN
+        generateValue: true
+      - key: SECRET_PASS
+        generateValue: true
+      - key: SECRET_TOKEN_MASTER
+        generateValue: true
+      - key: SECRET_PASS_MASTER
+        generateValue: true
