@@ -105,54 +105,29 @@ npm run preview
 
 FE (`love-story`) và BE (`../backend`) là **2 project độc lập, deploy riêng
 biệt** — `npm run deploy` ở đây **chỉ build và đẩy FE** lên GitHub Pages,
-**không đụng gì tới backend**. GitHub Pages chỉ phục vụ file tĩnh
-(HTML/CSS/JS) nên không thể tự chạy Node.js/MongoDB — backend phải được
-host ở nơi khác và chạy 24/7 riêng.
+**không đụng gì tới backend**. GitHub Pages chỉ phục vụ file tĩnh nên không
+thể tự chạy Node.js/MongoDB — backend phải host riêng, chạy 24/7 ở nơi khác.
 
-### Chạy backend ở local (để trang Login hoạt động lúc `npm run dev`)
+Hướng dẫn chạy local + deploy backend (Render + MongoDB Atlas, cả 2 free)
+đầy đủ nằm ở **[`../backend/README.md`](../backend/README.md)**. Phần FE
+chỉ cần biết:
 
-```bash
-cd backend
-npm install
-cp ex.env .env          # sửa MONGODB_DATA_URL trong .env cho khớp Mongo máy bạn
-npm run dev              # mặc định chạy ở http://localhost:3003
-```
+- **Dev local**: mặc định FE gọi API tới `http://localhost:3003` (xem
+  `src/utils/api.js`) — chạy backend local đúng port đó là trang Login hoạt
+  động ngay, không cần cấu hình gì thêm. Tài khoản test có sẵn: `love` / `123456`.
+- **Deploy production**: sau khi backend đã chạy ở 1 URL public (vd
+  `https://lovestory-backend.onrender.com`), set URL đó vào
+  `love-story/.env.production`:
+  ```
+  VITE_API_URL=https://<url-backend-that>
+  ```
+  Vite tự nạp file này khi `npm run build`/`npm run deploy`. Backend cũng
+  cần set `CORS_ORIGINS=https://<username>.github.io` (không để `*`) để
+  trình duyệt cho phép gọi cross-origin.
 
-Backend tự seed sẵn 1 tài khoản khi khởi động lần đầu: `love` / `123456`
-(company code `LOVESTORY`) — dùng luôn để test đăng nhập, không cần tạo tay.
-Mặc định FE gọi API tới `http://localhost:3003` (xem `src/utils/api.js`),
-đúng với backend chạy local ở trên nên **không cần cấu hình gì thêm khi dev**.
-
-### Deploy backend lên production (bắt buộc nếu muốn Login hoạt động thật trên link GitHub Pages)
-
-1. Host backend ở một nơi chạy Node.js liên tục + có MongoDB (VPS, Render,
-   Railway, Fly.io, hoặc MongoDB Atlas cho phần DB). Repo đã có sẵn
-   `backend/Dockerfile` nếu deploy bằng Docker:
-   ```bash
-   cd backend
-   docker build -t love-story-backend .
-   docker run -d -p 3003:3003 --env-file .env love-story-backend
-   ```
-   Lưu ý: `MONGODB_DATA_URL=mongodb://127.0.0.1:27017...` chỉ đúng khi Mongo
-   chạy trên chính máy đang chạy Node (không phải trong Docker). Deploy thật
-   thì sửa `MONGODB_DATA_URL` trỏ tới Mongo thật (Atlas, hoặc container Mongo
-   cùng network) trước khi build/run.
-2. Trong `.env` của backend production, set `CORS_ORIGINS` là đúng domain
-   GitHub Pages của bạn (thay vì để trống `*`), ví dụ:
-   ```
-   CORS_ORIGINS=https://<username>.github.io
-   ```
-3. Tạo file `love-story/.env.production` trỏ về domain backend vừa deploy:
-   ```
-   VITE_API_URL=https://api.your-domain.com
-   ```
-   Vite tự nạp file này khi chạy `npm run build`/`npm run deploy` — thiếu
-   bước này thì bản deploy trên GitHub Pages vẫn gọi về `localhost:3003`
-   (chỉ chạy được trên máy bạn) và người khác mở link sẽ không đăng nhập được.
-
-Nếu chưa muốn setup backend production, trang vẫn deploy bình thường —
-chỉ riêng nút đăng nhập sẽ báo lỗi "Không thể kết nối máy chủ" cho tới khi
-có `VITE_API_URL` trỏ tới backend đang chạy.
+Nếu chưa deploy backend, trang vẫn lên GitHub Pages bình thường — chỉ riêng
+nút đăng nhập báo lỗi "Không thể kết nối máy chủ" tới khi `VITE_API_URL`
+trỏ đúng backend đang chạy.
 
 ## 🌐 Deploy lên GitHub Pages
 
