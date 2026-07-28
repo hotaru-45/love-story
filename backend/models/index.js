@@ -58,6 +58,7 @@ const getBaseConnection = () => {
     baseConn.on('reconnected', () => logger.info('mongo base connection RECONNECTED'));
     baseConn.on('disconnected', () => logger.info('mongo base connection DISCONNECTED'));
     baseConn.on('close', () => logger.info('mongo base connection CLOSE'));
+    baseConn.on('error', (err) => logger.error(err.stack ? err.stack : err.message));
     return baseConn;
 };
 
