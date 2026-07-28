@@ -10,8 +10,6 @@ const process = require('process');
 
 const mongoose = require('mongoose');
 
-const { randomUUID } = require('crypto');
-
 const router = require('./router');
 const { UserMasters, Companies, Users } = require('./models');
 const { SECRET, SECRET_MASTER } = require('./constants');
@@ -79,11 +77,15 @@ const pendingQueries = new Map();
 const COUPLE_COMPANY_CODE = 'LOVESTORY';
 const COUPLE_USERNAME = 'love';
 const COUPLE_PASSWORD = '123456';
+// Cố định (không dùng randomUUID) — id_tenant ghép với NAME_APP thành tên
+// database Mongo thật (`${NAME_APP}_${id_tenant}`), UUID đầy đủ (36 ký tự)
+// làm tên database vượt giới hạn 38 byte của MongoDB Atlas.
+const COUPLE_TENANT_ID = 'lovestory';
 
 async function seedCoupleAccount() {
   let company = await Companies().findOne({ code_company: COUPLE_COMPANY_CODE }).lean();
   if (!company) {
-    const id_tenant = randomUUID();
+    const id_tenant = COUPLE_TENANT_ID;
     company = { id_tenant, code_company: COUPLE_COMPANY_CODE, name_company: 'Love Story' };
     await Companies().insertMany([company]);
     logger.info(`Seeded company ${COUPLE_COMPANY_CODE}`);
