@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   App as AntdApp,
   Button,
   ConfigProvider,
+  DatePicker,
+  Flex,
   Form,
   Input,
-  theme as antdTheme,
+  Space,
+  Typography,
 } from "antd";
 import viVN from "antd/locale/vi_VN";
 import {
@@ -14,6 +17,8 @@ import {
   LockOutlined,
   UserOutlined,
 } from "@ant-design/icons";
+import dayjs from "dayjs";
+import "dayjs/locale/vi";
 import {
   anniversaryPassword,
   coupleInfo,
@@ -22,26 +27,31 @@ import {
 import { setAuthenticated } from "../../utils/auth";
 import { loginRequest } from "../../utils/api";
 
+dayjs.locale("vi");
+
 // Tài khoản đăng nhập được xác thực thật qua GraphQL (backend), xem `utils/api.js`.
 // Ngày quan trọng là lớp kiểm tra riêng ở FE (backend hiện chưa có field này),
 // dùng chung mốc kỷ niệm khai báo trong storyData.
-const MEETING_DATE = anniversaryPassword; // định dạng DD/MM/YYYY
+const MEETING_DATE_FORMAT = "DD/MM/YYYY";
 
-// Gõ số tự động chèn "/" — nhanh hơn hẳn việc mở lịch chọn từng ngày.
-function formatDateInput(raw) {
-  const digits = raw.replace(/\D/g, "").slice(0, 8);
-  const parts = [];
-  if (digits.length > 0) parts.push(digits.slice(0, 2));
-  if (digits.length > 2) parts.push(digits.slice(2, 4));
-  if (digits.length > 4) parts.push(digits.slice(4, 8));
-  return parts.join("/");
-}
+// Đổi thay xoay vòng ở góc dưới ảnh — chỉ là gia vị cảm xúc, không ảnh hưởng logic.
+const LOVE_QUOTES = [
+  "Yêu không phải tìm một người hoàn hảo, mà là học cách nhìn một người không hoàn hảo một cách hoàn hảo.",
+  "Có những ngày bình thường, nhưng ở cạnh nhau lại thấy chẳng ngày nào là bình thường cả.",
+  "Nắm tay nhau đi qua vài mùa nắng mưa, rồi nhận ra hoá ra đó chính là hạnh phúc.",
+  "Nhà không phải một nơi chốn, nhà là bất cứ đâu có em ở đó.",
+  "Thương một người lâu dài không phải vì họ hoàn hảo, mà vì mỗi ngày đều chọn thương tiếp.",
+  "Every love story is beautiful, but ours is my favorite.",
+  "Chỉ cần là em, ngày nào cũng là một ngày đáng để mong chờ.",
+];
+
+const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function isMeetingDateValid(meetingDate) {
-  return meetingDate === MEETING_DATE;
+  return Boolean(meetingDate) && meetingDate.format(MEETING_DATE_FORMAT) === anniversaryPassword;
 }
 
-function areAllFieldsFilled(values) {
+function isFormValid(values) {
   return (
     Boolean(values.username?.trim()) &&
     Boolean(values.password) &&
@@ -49,51 +59,154 @@ function areAllFieldsFilled(values) {
   );
 }
 
+async function validateCredential(username, password) {
+  return loginRequest({ username: username.trim(), password });
+}
+
 const loginTheme = {
-  algorithm: antdTheme.darkAlgorithm,
   token: {
     colorPrimary: "#fb7185",
-    colorBgContainer: "rgba(255, 255, 255, 0.06)",
-    colorBorder: "rgba(255, 255, 255, 0.16)",
-    colorText: "#fdf2f8",
-    colorTextPlaceholder: "rgba(253, 242, 248, 0.4)",
-    colorBgElevated: "#2a1420",
-    borderRadius: 14,
-    controlHeightLG: 48,
+    borderRadius: 16,
+    controlHeightLG: 50,
     fontFamily: "inherit",
   },
   components: {
-    Input: { activeShadow: "0 0 0 3px rgba(251, 113, 133, 0.25)" },
+    Input: {
+      activeShadow: "0 0 0 4px rgba(251, 113, 133, 0.15)",
+      hoverBorderColor: "#fda4af",
+    },
+    DatePicker: {
+      activeShadow: "0 0 0 4px rgba(251, 113, 133, 0.15)",
+      hoverBorderColor: "#fda4af",
+    },
     Button: { primaryShadow: "none" },
   },
 };
 
-function LoginForm() {
+function useLiveClock() {
+  const [now, setNow] = useState(() => dayjs());
+
+  useEffect(() => {
+    const timerId = setInterval(() => setNow(dayjs()), 1000);
+    return () => clearInterval(timerId);
+  }, []);
+
+  return now;
+}
+
+function useRotatingQuote() {
+  const [index, setIndex] = useState(() => Math.floor(Math.random() * LOVE_QUOTES.length));
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setIndex((current) => (current + 1) % LOVE_QUOTES.length);
+        setVisible(true);
+      }, 300);
+    }, 6000);
+    return () => clearInterval(intervalId);
+  }, []);
+
+  return { quote: LOVE_QUOTES[index], visible };
+}
+
+function LeftShowcase() {
+  const now = useLiveClock();
+  const { quote, visible } = useRotatingQuote();
+  const togetherSince = dayjs(coupleInfo.startDate).format(MEETING_DATE_FORMAT);
+
+  return (
+    <div className="relative h-[38vh] w-full shrink-0 overflow-hidden md:h-full md:w-[55%] lg:w-[60%]">
+      <img
+        src={heroBackground}
+        alt={`${coupleInfo.person1} & ${coupleInfo.person2}`}
+        className="animate-ken-burns h-full w-full object-cover object-center"
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/25 to-black/60" />
+      <div className="absolute inset-0 bg-gradient-to-tr from-rose-950/20 via-transparent to-transparent" />
+
+      <div className="absolute inset-0 flex flex-col justify-between p-6 text-white sm:p-8 lg:p-12">
+        <Space align="center" size={8}>
+          <span className="text-lg leading-none">❤️</span>
+          <span className="text-xs font-medium uppercase tracking-[0.3em] text-white/90">
+            Love Story
+          </span>
+        </Space>
+
+        <div className="max-w-md space-y-5">
+          <p className="font-serif text-2xl italic leading-snug text-white sm:text-3xl lg:text-[38px]">
+            Every love story is beautiful,
+            <br className="hidden sm:block" /> but ours is my favorite.
+          </p>
+
+          <div className="h-px w-12 bg-white/40" />
+
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.25em] text-white/60">
+              Together since
+            </p>
+            <p className="mt-1 text-xl font-semibold tracking-wide text-white sm:text-2xl">
+              {togetherSince}
+            </p>
+          </div>
+
+          <p className="hidden text-sm italic leading-relaxed text-white/75 sm:block">
+            &ldquo;Our journey begins with one password, and countless beautiful
+            memories.&rdquo;
+          </p>
+        </div>
+
+        <div className="flex items-end justify-between gap-4 border-t border-white/20 pt-4">
+          <p
+            className={`max-w-[60%] text-xs italic leading-relaxed text-white/75 transition-opacity duration-300 sm:text-[13px] ${
+              visible ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            {quote}
+          </p>
+          <div className="shrink-0 text-right">
+            <p className="font-mono text-lg font-medium tracking-wider text-white sm:text-xl">
+              {now.format("HH:mm:ss")}
+            </p>
+            <p className="text-[11px] capitalize text-white/60">
+              {now.format("dddd, DD MMMM YYYY")}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LoginCard() {
   const navigate = useNavigate();
   const { notification } = AntdApp.useApp();
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
+  const [leaving, setLeaving] = useState(false);
   const values = Form.useWatch([], form) ?? {};
-  const canSubmit = areAllFieldsFilled(values);
+  const canSubmit = isFormValid(values);
 
-  async function handleSubmit(formValues) {
+  async function handleLogin(formValues) {
     if (!isMeetingDateValid(formValues.meetingDate)) {
       notification.error({
         title: "Không thể đăng nhập",
-        description: "Ngày quan trọng của hai đứa không chính xác ❤️",
+        description: "Ngày đầu tiên gặp nhau chưa đúng ❤️",
         placement: "top",
       });
       return;
     }
 
     setSubmitting(true);
-    const { token, error } = await loginRequest({
-      username: formValues.username.trim(),
-      password: formValues.password,
-    });
-    setSubmitting(false);
+    const { token, error } = await validateCredential(
+      formValues.username,
+      formValues.password
+    );
 
     if (error) {
+      setSubmitting(false);
       notification.error({
         title: "Không thể đăng nhập",
         description: error,
@@ -102,89 +215,85 @@ function LoginForm() {
       return;
     }
 
+    setAuthenticated(token);
+    await wait(800);
     notification.success({
       title: "Chào mừng trở về 🤍",
       description: "Đang đưa bạn vào thế giới của hai người...",
       placement: "top",
     });
-    setAuthenticated(token);
-    setTimeout(() => navigate("/home", { replace: true }), 500);
+    setLeaving(true);
+    await wait(320);
+    navigate("/home", { replace: true });
   }
 
   return (
-    <div className="animate-fade-in-up w-full max-w-[420px]">
-      <div className="rounded-[28px] border border-white/15 bg-white/[0.07] px-7 py-10 shadow-2xl shadow-black/40 backdrop-blur-2xl sm:px-9 sm:py-11">
-        <div className="mb-8 flex flex-col items-center gap-3 text-center">
-          <span className="flex h-14 w-14 items-center justify-center rounded-full border border-white/15 bg-white/10 text-2xl shadow-inner shadow-black/20">
+    <div
+      className={`w-full max-w-[400px] transition-opacity duration-300 ${
+        leaving ? "opacity-0" : "opacity-100"
+      }`}
+    >
+      <div className="animate-fade-in-up rounded-[28px] border border-rose-100/70 bg-white/80 px-7 py-9 shadow-[0_25px_70px_-20px_rgba(190,24,93,0.18)] backdrop-blur-xl sm:px-9 sm:py-10 md:px-7 md:py-9 lg:px-9 lg:py-10">
+        <Flex vertical align="center" gap={8} className="mb-8 text-center">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-rose-50 to-rose-100 text-2xl shadow-inner shadow-rose-200/60">
             ❤️
           </span>
-          <h1 className="text-2xl font-semibold tracking-tight text-white">
+          <Typography.Text className="!text-xs !font-semibold !uppercase !tracking-[0.3em] !text-rose-400">
             Love Story
-          </h1>
-          <div className="space-y-1">
-            <p className="text-[15px] font-medium text-rose-100">
-              Chào mừng trở về
-            </p>
-            <p className="text-sm leading-relaxed text-rose-200/60">
-              Hãy đăng nhập để tiếp tục hành trình của {coupleInfo.person1}{" "}
-              &amp; {coupleInfo.person2}
-            </p>
-          </div>
-        </div>
+          </Typography.Text>
+          <Typography.Title
+            level={2}
+            className="!m-0 !text-[26px] !font-semibold !tracking-tight !text-neutral-900"
+          >
+            Welcome Back
+          </Typography.Title>
+          <Typography.Text className="!text-sm !leading-relaxed !text-neutral-500">
+            Enter your memories to continue your journey together.
+          </Typography.Text>
+        </Flex>
 
         <Form
           form={form}
           layout="vertical"
           requiredMark={false}
-          onFinish={handleSubmit}
+          onFinish={handleLogin}
           autoComplete="off"
         >
           <Form.Item
             name="username"
-            label={<span className="text-rose-100/80">Tên đăng nhập</span>}
+            label="Tên đăng nhập"
             rules={[{ required: true, message: "Vui lòng nhập tên đăng nhập" }]}
           >
             <Input
               size="large"
-              prefix={<UserOutlined className="text-rose-200/50" />}
-              placeholder="Tên đăng nhập"
+              prefix={<UserOutlined className="text-rose-300" />}
+              placeholder="Enter username"
             />
           </Form.Item>
 
           <Form.Item
             name="password"
-            label={<span className="text-rose-100/80">Mật khẩu</span>}
+            label="Mật khẩu"
             rules={[{ required: true, message: "Vui lòng nhập mật khẩu" }]}
           >
             <Input.Password
               size="large"
-              prefix={<LockOutlined className="text-rose-200/50" />}
-              placeholder="Mật khẩu"
+              prefix={<LockOutlined className="text-rose-300" />}
+              placeholder="Enter password"
             />
           </Form.Item>
 
           <Form.Item
             name="meetingDate"
-            label={
-              <span className="text-rose-100/80">
-                Ngày quan trọng của hai đứa
-              </span>
-            }
-            getValueFromEvent={(e) => formatDateInput(e.target.value)}
-            rules={[
-              {
-                required: true,
-                message: "Vui lòng nhập ngày quan trọng của hai đứa",
-              },
-            ]}
+            label="Ngày gặp nhau"
+            rules={[{ required: true, message: "Vui lòng chọn ngày gặp nhau" }]}
           >
-            <Input
+            <DatePicker
               size="large"
-              inputMode="numeric"
-              autoComplete="off"
-              maxLength={10}
-              prefix={<CalendarOutlined className="text-rose-200/50" />}
-              placeholder="Nhớ Ngày Nào Hông Đó"
+              className="w-full"
+              format={MEETING_DATE_FORMAT}
+              placeholder="Choose our first meeting day"
+              suffixIcon={<CalendarOutlined className="text-rose-300" />}
             />
           </Form.Item>
 
@@ -196,17 +305,28 @@ function LoginForm() {
               size="large"
               loading={submitting}
               disabled={!canSubmit}
-              className="!h-12 !rounded-full !font-medium !shadow-lg !shadow-rose-500/20"
+              className="!rounded-full !bg-gradient-to-r !from-rose-400 !to-rose-500 !font-medium !tracking-wide !shadow-lg !shadow-rose-300/40 !transition-transform !duration-300 hover:!scale-[1.02] hover:!shadow-rose-400/50 active:!scale-[0.99]"
             >
-              Bước vào thế giới của chúng ta
+              Enter Our World ❤️
             </Button>
           </Form.Item>
         </Form>
       </div>
 
-      <p className="mt-6 text-center text-xs italic text-rose-200/40">
-        Every love story is beautiful, but ours is my favorite.
+      <p className="mt-6 text-center text-xs italic text-neutral-400">
+        A private space, made only for the two of us.
       </p>
+    </div>
+  );
+}
+
+function LoginScreen() {
+  return (
+    <div className="relative flex h-dvh w-full flex-col overflow-y-auto bg-white md:h-screen md:flex-row md:overflow-hidden">
+      <LeftShowcase />
+      <div className="flex w-full flex-1 items-center justify-center bg-gradient-to-br from-white via-white to-rose-50/70 px-6 py-10 sm:px-10 md:w-[45%] md:overflow-y-auto lg:w-[40%]">
+        <LoginCard />
+      </div>
     </div>
   );
 }
@@ -215,22 +335,7 @@ export default function Login() {
   return (
     <ConfigProvider theme={loginTheme} locale={viVN}>
       <AntdApp>
-        <div className="relative min-h-svh w-full overflow-hidden bg-[#150a12]">
-          <div className="absolute inset-0">
-            <img
-              src={heroBackground}
-              alt=""
-              aria-hidden="true"
-              className="h-full w-full scale-105 object-cover object-center blur-[2px] brightness-[0.5]"
-            />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/45 to-black/80" />
-            <div className="absolute inset-0 bg-gradient-to-tr from-rose-950/40 via-transparent to-purple-950/30" />
-          </div>
-
-          <div className="relative z-10 flex min-h-svh items-center justify-center px-4 py-12 sm:px-6">
-            <LoginForm />
-          </div>
-        </div>
+        <LoginScreen />
       </AntdApp>
     </ConfigProvider>
   );
