@@ -15,7 +15,7 @@ const UPLOADS_DIR = path.join(__dirname, '../uploads');
 async function copyAssetToUploads(tenant, documentCode, assetFileName) {
     const srcPath = path.join(ASSETS_DIR, assetFileName);
     if (!fs.existsSync(srcPath)) {
-        logger.warn(`seedLoveStoryContent: asset not found, skip: ${assetFileName}`);
+        logger.info(`seedLoveStoryContent: asset not found, skip: ${assetFileName}`);
         return '';
     }
 
