@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { MotionConfig } from 'framer-motion'
 import { HashRouter, Navigate, Routes, Route, useNavigate } from 'react-router-dom'
 import { App as AntdApp, ConfigProvider } from 'antd'
@@ -7,7 +8,24 @@ import LoveStoryDataProvider from './components/LoveStoryDataProvider'
 import Login from './pages/Login'
 import Experience from './pages/Experience'
 import { usePreferences } from './hooks/preferencesContext'
-import { clearAuthenticated, isAuthenticated } from './utils/auth'
+import { clearAuthenticated, isAuthenticated, AUTH_EXPIRED_EVENT } from './utils/auth'
+
+// Lắng nghe sự kiện phát ra khi API phát hiện token hết hạn (xem
+// `utils/auth.js#notifyAuthExpired`) và điều hướng về trang Login thay vì để
+// người dùng đứng đơ trên màn hình báo lỗi "not authenticated".
+function AuthExpiryWatcher() {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    function handleAuthExpired() {
+      navigate('/', { replace: true })
+    }
+    window.addEventListener(AUTH_EXPIRED_EVENT, handleAuthExpired)
+    return () => window.removeEventListener(AUTH_EXPIRED_EVENT, handleAuthExpired)
+  }, [navigate])
+
+  return null
+}
 
 function LoginRoute() {
   return isAuthenticated() ? <Navigate to="/home" replace /> : <Login />
@@ -44,6 +62,7 @@ function App() {
   return (
     <MotionConfig reducedMotion={reducedMotion ? 'always' : 'never'}>
       <HashRouter>
+        <AuthExpiryWatcher />
         <Routes>
           <Route path="/" element={<LoginRoute />} />
           <Route path="/home" element={<HomeRoute />} />

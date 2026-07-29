@@ -1,9 +1,13 @@
 // Client GraphQL cho toàn bộ nội dung "Love Story" (chương kỷ niệm, ảnh, chat,
 // cấu hình chung...) — thay thế dữ liệu tĩnh cũ ở `data/storyData.js`.
 import { API_BASE_URL, COMPANY_CODE } from './api'
-import { getToken, getTenant } from './auth'
+import { getToken, getTenant, notifyAuthExpired } from './auth'
 
 const FILE_FRAGMENT = `_id FILE`
+
+// Xem `backend/graphql/auth/index.js` — middleware `authentication()` ném đúng
+// các message này khi token thiếu/sai/hết hạn (>12h).
+const AUTH_ERROR_MESSAGES = ['You are not authenticated!', 'You are not authentication_master!']
 
 async function graphqlRequest(query, variables) {
   const response = await fetch(`${API_BASE_URL}/graphql`, {
@@ -17,7 +21,12 @@ async function graphqlRequest(query, variables) {
   })
   const json = await response.json().catch(() => null)
   if (json?.errors?.length) {
-    throw new Error(json.errors[0]?.message || 'Đã có lỗi xảy ra')
+    const message = json.errors[0]?.message || 'Đã có lỗi xảy ra'
+    if (AUTH_ERROR_MESSAGES.includes(message)) {
+      notifyAuthExpired()
+      throw new Error('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.')
+    }
+    throw new Error(message)
   }
   return json?.data
 }
@@ -41,6 +50,10 @@ export async function uploadImage(file, documentCode) {
     body: formData,
   })
   const json = await response.json().catch(() => null)
+  if (json?.error === 'Unauthorized') {
+    notifyAuthExpired()
+    throw new Error('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.')
+  }
   if (json?.error) throw new Error(json.error)
   const uploaded = json?.files?.[0]
   if (!uploaded?._id) throw new Error('Tải ảnh lên thất bại')

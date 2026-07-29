@@ -38,3 +38,17 @@ export function clearAuthenticated() {
     // no-op
   }
 }
+
+export const AUTH_EXPIRED_EVENT = 'love-story-auth-expired'
+
+// Backend trả "You are not authenticated!" (xem `backend/graphql/auth/index.js`)
+// khi token hết hạn (>12h) hoặc không hợp lệ. Gọi hàm này để dọn phiên đăng
+// nhập và báo cho App.jsx điều hướng về trang Login thay vì đứng đơ.
+export function notifyAuthExpired() {
+  clearAuthenticated()
+  try {
+    window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT))
+  } catch {
+    // no-op (SSR hoặc môi trường không có window)
+  }
+}

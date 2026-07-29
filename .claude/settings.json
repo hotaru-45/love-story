@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx --yes playwright screenshot --viewport-size=820,1180 '--wait-for-selector=text=Welcome Back' --wait-for-timeout=800 'http://localhost:5183/#/' C:/Users/ad/AppData/Local/Temp/claude/d--LoveStory/45fc47af-40eb-4bdd-9f75-a8ce2ea8018f/scratchpad/login-tablet.png)",
+      "Bash(npx --yes playwright screenshot --viewport-size=390,844 '--wait-for-selector=text=Welcome Back' --wait-for-timeout=800 'http://localhost:5183/#/' C:/Users/ad/AppData/Local/Temp/claude/d--LoveStory/45fc47af-40eb-4bdd-9f75-a8ce2ea8018f/scratchpad/login-mobile.png)",
+      "Bash(sed -i \"s/import { chromium } from 'playwright';/const { chromium } = require\\('playwright'\\);/\" \"d:/LoveStory/love-story/__interact.cjs\")",
+      "Bash(sed -i \"s/^await /await \\(async \\(\\) => {}\\)\\(\\); await /\" \"d:/LoveStory/love-story/__interact.cjs\")",
+      "Bash(npx --yes -p playwright node __interact.cjs)",
+      "Bash(grep -rn \"message.*deprecated\\\\|Please use \\\\`title\\\\`\" \"d:/LoveStory/love-story/node_modules/antd/es/notification\")"
+    ]
+  }
+}
