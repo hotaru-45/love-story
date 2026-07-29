@@ -12,6 +12,14 @@ const MASTER_LOGIN = {
   LOCKOUT_TIME: +process.env.MASTER_LOCKOUT_TIME || 30, // số phút bị khóa
 };
 
+// Lưu ảnh upload qua Cloudinary thay vì đĩa local — Render free tier không
+// giữ file giữa các lần deploy/restart (ephemeral disk).
+const CLOUDINARY = {
+  CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME || '',
+  API_KEY: process.env.CLOUDINARY_API_KEY || '',
+  API_SECRET: process.env.CLOUDINARY_API_SECRET || '',
+};
+
 const MANAGER_STAGE = 'MANAGER_STAGE';
 const MANAGER_HEADQUARTER = 'MANAGER_HEADQUARTER';
 const MANAGER_STORE = 'MANAGER_STORE';
@@ -50,6 +58,7 @@ module.exports = {
   SECRET,
   SECRET_MASTER,
   MASTER_LOGIN,
+  CLOUDINARY,
   MANAGER_STAGE,
   MANAGER_HEADQUARTER,
   MANAGER_STORE,

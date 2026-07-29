@@ -4,9 +4,9 @@
 // Idempotent: bỏ qua nếu StoryChapters đã có dữ liệu.
 const fs = require('fs');
 const path = require('path');
-const crypto = require('crypto');
 
 const logger = require('../logger');
+const { uploadToCloudinary } = require('../utils/cloudinary');
 const { StoryChapters, GalleryPhotos, ChatMessages, LoveStorySettings, UploadFiles } = require('../models');
 
 // Ảnh nằm ngay trong backend/ (không phải ../../love-story/src/assets) vì
@@ -14,7 +14,6 @@ const { StoryChapters, GalleryPhotos, ChatMessages, LoveStorySettings, UploadFil
 // `dockerContext: backend`) — nếu để ở love-story/ thì trên Render sẽ không
 // bao giờ thấy file, ảnh luôn bị bỏ qua khi seed.
 const ASSETS_DIR = path.join(__dirname, 'assets');
-const UPLOADS_DIR = path.join(__dirname, '../uploads');
 
 const HERO_BACKGROUND_ASSET = 'hình_2_đứa_đi_vũng_tàu2.png';
 const FINAL_BACKGROUND_ASSET = 'hình_em_đẹp_background2.png';
@@ -41,22 +40,19 @@ const GALLERY_PHOTOS_SEED = [
     { asset: 'đi_chơi_ở_long_an.png', caption: 'Đi chơi ở Long An 🌾' },
 ];
 
-async function copyAssetToUploads(tenant, documentCode, assetFileName) {
+async function copyAssetToUploads(tenant, assetFileName) {
     const srcPath = path.join(ASSETS_DIR, assetFileName);
     if (!fs.existsSync(srcPath)) {
         logger.info(`seedLoveStoryContent: asset not found, skip: ${assetFileName}`);
         return '';
     }
 
-    const docDir = path.join(UPLOADS_DIR, documentCode);
-    await fs.promises.mkdir(docDir, { recursive: true });
+    const buffer = await fs.promises.readFile(srcPath);
+    const secureUrl = await uploadToCloudinary(buffer, assetFileName);
 
     const ext = path.extname(assetFileName);
-    const newName = crypto.randomUUID() + ext;
-    await fs.promises.copyFile(srcPath, path.join(docDir, newName));
-
     const saved = await new (UploadFiles(tenant))({
-        FILE: documentCode + '/' + newName,
+        FILE: secureUrl,
         FILE_NAME: assetFileName,
         FILE_TYPE: ext === '.png' ? 'image/png' : ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' : '',
     }).save();
@@ -77,20 +73,30 @@ async function dedupeLoveStorySettings(tenant) {
     logger.info(`seedLoveStoryContent: đã xoá ${idsToRemove.length} document settings trùng, giữ lại ${keep._id}`);
 }
 
-// Dành cho dữ liệu đã seed từ trước lúc asset chưa nằm trong Docker context
-// (xem ASSETS_DIR ở trên) nên bị lưu với ảnh rỗng — chạy mỗi lần boot, khớp
-// lại đúng document đang thiếu ảnh với asset tương ứng theo title/caption
-// gốc rồi điền vào chỗ còn trống. Không đụng tới document đã có ảnh.
+// Ảnh cũ (trước khi đổi sang Cloudinary) trỏ tới đường dẫn local dạng
+// "story-chapters/uuid.png" — các file đó đã mất sạch vì đĩa Render không
+// bền vững giữa các lần deploy/restart. Chỉ ảnh mới (Cloudinary) mới có FILE
+// dạng URL đầy đủ (http...), nên dùng đó để phân biệt "còn thiếu/hỏng ảnh"
+// thay vì chỉ check field có rỗng hay không.
+async function needsImageBackfill(tenant, uploadFileId) {
+    if (!uploadFileId) return true;
+    const file = await UploadFiles(tenant).findById(uploadFileId).lean();
+    return !file || !/^https?:\/\//.test(file.FILE || '');
+}
+
+// Chạy mỗi lần boot, khớp lại đúng document đang thiếu/hỏng ảnh với asset
+// tương ứng theo title/caption gốc rồi điền/thay vào. Không đụng tới
+// document đã có ảnh Cloudinary hợp lệ.
 async function backfillMissingImages(tenant) {
     const settings = await LoveStorySettings(tenant).findOne({}).lean();
     if (settings) {
         const patch = {};
-        if (!settings.hero_background) {
-            const id = await copyAssetToUploads(tenant, 'love-story-settings', HERO_BACKGROUND_ASSET);
+        if (await needsImageBackfill(tenant, settings.hero_background)) {
+            const id = await copyAssetToUploads(tenant, HERO_BACKGROUND_ASSET);
             if (id) patch.hero_background = id;
         }
-        if (!settings.final_background) {
-            const id = await copyAssetToUploads(tenant, 'love-story-settings', FINAL_BACKGROUND_ASSET);
+        if (await needsImageBackfill(tenant, settings.final_background)) {
+            const id = await copyAssetToUploads(tenant, FINAL_BACKGROUND_ASSET);
             if (id) patch.final_background = id;
         }
         if (Object.keys(patch).length > 0) {
@@ -99,22 +105,24 @@ async function backfillMissingImages(tenant) {
         }
     }
 
-    const chaptersMissingImage = await StoryChapters(tenant).find({ image: '' }).lean();
-    for (const doc of chaptersMissingImage) {
+    const allChapters = await StoryChapters(tenant).find({}).lean();
+    for (const doc of allChapters) {
+        if (!(await needsImageBackfill(tenant, doc.image))) continue;
         const match = CHAPTERS_SEED.find((c) => c.title === doc.title);
         if (!match) continue;
-        const image = await copyAssetToUploads(tenant, 'story-chapters', match.asset);
+        const image = await copyAssetToUploads(tenant, match.asset);
         if (image) {
             await StoryChapters(tenant).findByIdAndUpdate(doc._id, { image });
             logger.info(`backfillMissingImages: đã bổ sung ảnh cho chương "${doc.title}"`);
         }
     }
 
-    const galleryMissingSrc = await GalleryPhotos(tenant).find({ src: '' }).lean();
-    for (const doc of galleryMissingSrc) {
+    const allGallery = await GalleryPhotos(tenant).find({}).lean();
+    for (const doc of allGallery) {
+        if (!(await needsImageBackfill(tenant, doc.src))) continue;
         const match = GALLERY_PHOTOS_SEED.find((p) => p.caption === doc.caption);
         if (!match) continue;
-        const src = await copyAssetToUploads(tenant, 'gallery-photos', match.asset);
+        const src = await copyAssetToUploads(tenant, match.asset);
         if (src) {
             await GalleryPhotos(tenant).findByIdAndUpdate(doc._id, { src });
             logger.info(`backfillMissingImages: đã bổ sung ảnh cho gallery "${doc.caption}"`);
@@ -131,8 +139,8 @@ async function seedLoveStoryContent(tenant) {
 
     logger.info('Seeding love story content...');
 
-    const heroBackground = await copyAssetToUploads(tenant, 'love-story-settings', HERO_BACKGROUND_ASSET);
-    const finalBackground = await copyAssetToUploads(tenant, 'love-story-settings', FINAL_BACKGROUND_ASSET);
+    const heroBackground = await copyAssetToUploads(tenant, HERO_BACKGROUND_ASSET);
+    const finalBackground = await copyAssetToUploads(tenant, FINAL_BACKGROUND_ASSET);
 
     // Nếu getOrCreateSettings đã tạo sẵn 1 document rỗng, cập nhật vào đó thay vì
     // insert thêm bản mới — tránh lặp lại chính lỗi vừa dọn ở trên.
@@ -179,7 +187,7 @@ async function seedLoveStoryContent(tenant) {
     const legacyIdToMongoId = {};
     for (let i = 0; i < CHAPTERS_SEED.length; i++) {
         const c = CHAPTERS_SEED[i];
-        const image = await copyAssetToUploads(tenant, 'story-chapters', c.asset);
+        const image = await copyAssetToUploads(tenant, c.asset);
         const saved = await new (StoryChapters(tenant))({
             date: c.date,
             title: c.title,
@@ -196,7 +204,7 @@ async function seedLoveStoryContent(tenant) {
 
     for (let i = 0; i < GALLERY_PHOTOS_SEED.length; i++) {
         const p = GALLERY_PHOTOS_SEED[i];
-        const src = await copyAssetToUploads(tenant, 'gallery-photos', p.asset);
+        const src = await copyAssetToUploads(tenant, p.asset);
         await new (GalleryPhotos(tenant))({ src, caption: p.caption, sort_order: i }).save();
     }
 

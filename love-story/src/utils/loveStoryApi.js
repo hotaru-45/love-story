@@ -36,10 +36,13 @@ async function graphqlRequest(query, variables) {
   return json?.data
 }
 
-// Ảnh phục vụ qua /load-file, xác thực bằng query string vì <img src> không
+// Ảnh upload mới lưu trên Cloudinary — FILE đã là URL đầy đủ, dùng thẳng.
+// FILE kiểu cũ ("story-chapters/uuid.png", trước khi đổi sang Cloudinary)
+// vẫn phục vụ qua /load-file, xác thực bằng query string vì <img src> không
 // gửi được header tuỳ biến. Xem `backend/router/utils/verifyToken.js`.
 export function fileUrl(file) {
   if (!file?.FILE) return null
+  if (/^https?:\/\//.test(file.FILE)) return file.FILE
   const params = new URLSearchParams({ token: getToken() || '', tenant: getTenant() || '' })
   return `${API_BASE_URL}/load-file/${file.FILE}?${params.toString()}`
 }
