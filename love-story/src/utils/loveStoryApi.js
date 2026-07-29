@@ -5,9 +5,14 @@ import { getToken, getTenant, notifyAuthExpired } from './auth'
 
 const FILE_FRAGMENT = `_id FILE`
 
-// Xem `backend/graphql/auth/index.js` — middleware `authentication()` ném đúng
-// các message này khi token thiếu/sai/hết hạn (>12h).
-const AUTH_ERROR_MESSAGES = ['You are not authenticated!', 'You are not authentication_master!']
+// Xem `backend/graphql/auth/index.js` — middleware `authentication()`/
+// `check_tenant()` ném đúng các message này khi token thiếu/sai/hết hạn
+// (>12h) hoặc tenant trong token không còn tồn tại (DB bị reset/đổi).
+const AUTH_ERROR_MESSAGES = [
+  'You are not authenticated!',
+  'You are not authentication_master!',
+  'tenant not exist',
+]
 
 async function graphqlRequest(query, variables) {
   const response = await fetch(`${API_BASE_URL}/graphql`, {
