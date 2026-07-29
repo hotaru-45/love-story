@@ -9,7 +9,11 @@ const crypto = require('crypto');
 const logger = require('../logger');
 const { StoryChapters, GalleryPhotos, ChatMessages, LoveStorySettings, UploadFiles } = require('../models');
 
-const ASSETS_DIR = path.join(__dirname, '../../love-story/src/assets');
+// Ảnh nằm ngay trong backend/ (không phải ../../love-story/src/assets) vì
+// Docker build của backend chỉ COPY đúng thư mục backend/ (xem render.yaml
+// `dockerContext: backend`) — nếu để ở love-story/ thì trên Render sẽ không
+// bao giờ thấy file, ảnh luôn bị bỏ qua khi seed.
+const ASSETS_DIR = path.join(__dirname, 'assets');
 const UPLOADS_DIR = path.join(__dirname, '../uploads');
 
 async function copyAssetToUploads(tenant, documentCode, assetFileName) {
@@ -34,7 +38,23 @@ async function copyAssetToUploads(tenant, documentCode, assetFileName) {
     return String(saved._id);
 }
 
+// `LoveStory_public_settings` (getOrCreateSettings) có thể đã tự tạo 1 document
+// settings rỗng nếu ai đó load trang Login trước khi seed này kịp chạy — dọn các
+// bản rỗng thừa đó, chỉ giữ lại 1 document (ưu tiên bản đã có anniversary_password).
+async function dedupeLoveStorySettings(tenant) {
+    const Model = LoveStorySettings(tenant);
+    const docs = await Model.find({}).sort({ created_at: 1 }).lean();
+    if (docs.length <= 1) return;
+
+    const keep = docs.find((d) => d.anniversary_password) || docs[docs.length - 1];
+    const idsToRemove = docs.filter((d) => String(d._id) !== String(keep._id)).map((d) => d._id);
+    await Model.deleteMany({ _id: { $in: idsToRemove } });
+    logger.info(`seedLoveStoryContent: đã xoá ${idsToRemove.length} document settings trùng, giữ lại ${keep._id}`);
+}
+
 async function seedLoveStoryContent(tenant) {
+    await dedupeLoveStorySettings(tenant);
+
     const alreadySeeded = await StoryChapters(tenant).countDocuments({});
     if (alreadySeeded > 0) return;
 
@@ -43,7 +63,11 @@ async function seedLoveStoryContent(tenant) {
     const heroBackground = await copyAssetToUploads(tenant, 'love-story-settings', 'hình_2_đứa_đi_vũng_tàu2.png');
     const finalBackground = await copyAssetToUploads(tenant, 'love-story-settings', 'hình_em_đẹp_background2.png');
 
-    await new (LoveStorySettings(tenant))({
+    // Nếu getOrCreateSettings đã tạo sẵn 1 document rỗng, cập nhật vào đó thay vì
+    // insert thêm bản mới — tránh lặp lại chính lỗi vừa dọn ở trên.
+    const existingSettings = await LoveStorySettings(tenant).findOne({}).lean();
+
+    const settingsPayload = {
         couple_person1: 'Khánh Duy',
         couple_person2: 'Phương Thảo',
         start_date: '2025-12-24T00:00:00',
@@ -73,7 +97,13 @@ async function seedLoveStoryContent(tenant) {
         footer_made_by: 'Khánh Duy',
         music_src: './music/bg-music.mp3',
         track_title: 'Khánh Duy & Phương Thảo — Bài Hát Của Chúng Mình',
-    }).save();
+    };
+
+    if (existingSettings) {
+        await LoveStorySettings(tenant).findByIdAndUpdate(existingSettings._id, settingsPayload);
+    } else {
+        await new (LoveStorySettings(tenant))(settingsPayload).save();
+    }
 
     const chaptersSeed = [
         { legacyId: 2, date: '24/12/2025', title: 'Lần đầu nhắn tin', content: 'Một tin nhắn "chào bạn" ngại ngùng, gõ đi xoá lại không biết bao nhiêu lần, cuối cùng cũng bấm gửi. Ai mà ngờ được một câu chào đơn giản như vậy lại mở ra hàng ngàn tin nhắn, hàng trăm đêm thức khuya trò chuyện sau đó.', hidden_thought: 'Mình đã gõ lại câu đó ít nhất 5 lần trước khi gửi.', mood: 'funny', asset: 'b.png', has_voice_note: false, locked: false },
